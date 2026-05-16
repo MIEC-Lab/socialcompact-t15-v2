@@ -57,3 +57,25 @@ Why these metrics?
 
 ## This repository
 The Agent folder has the purple agent docker file and source code, the Arena folder has the corresponding green agent files. 
+
+## CS183 Web Deployment Demo
+
+This project also includes a web deployment demo for the Survivor game:
+
+- `frontend/`: Next.js frontend deployed on Vercel.
+- `web-backend/`: FastAPI backend for starting matches, storing results, and serving process logs.
+- `agentbeats/`: Original Arena and Agent services for optional real Agent mode.
+
+For the V2 public demo, deploy `web-backend/` as a public FastAPI service and
+set the Vercel environment variable below so users do not need to enter a local
+backend port manually:
+
+```text
+NEXT_PUBLIC_API_BASE_URL=https://your-public-backend-url
+```
+
+Detailed Chinese instructions are available in:
+
+```text
+docs/V2_PUBLIC_BACKEND_DEPLOYMENT.md
+```

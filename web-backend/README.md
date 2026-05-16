@@ -61,3 +61,30 @@ Then start the Arena and player agent services from `agentbeats/`.
 
 When Arena mode is requested but unavailable, the backend falls back to the
 local simulation and marks the result source as `local-fallback`.
+
+## Public Backend Deployment
+
+For the V2 public demo, deploy only this `web-backend` directory as a public
+FastAPI service. Then set the Vercel frontend environment variable:
+
+```text
+NEXT_PUBLIC_API_BASE_URL=https://your-public-backend-url
+```
+
+Recommended deployment settings:
+
+```text
+Root Directory:
+web-backend
+
+Build Command:
+pip install -r requirements.txt
+
+Start Command:
+uvicorn app.main:app --host 0.0.0.0 --port $PORT
+
+Health Check Path:
+/api/health
+```
+
+See `docs/V2_PUBLIC_BACKEND_DEPLOYMENT.md` for the step-by-step Chinese guide.

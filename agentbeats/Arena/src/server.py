@@ -1,4 +1,5 @@
 import argparse
+import os
 import uvicorn
 
 from a2a.server.apps import A2AStarletteApplication
@@ -16,9 +17,10 @@ from arena_executor import Executor
 def main():
     parser = argparse.ArgumentParser(description="Run the A2A agent.")
     parser.add_argument("--host", type=str, default="127.0.0.1", help="Host to bind the server")
-    parser.add_argument("--port", type=int, default=9009, help="Port to bind the server")
+    parser.add_argument("--port", type=int, default=int(os.getenv("PORT", "9009")), help="Port to bind the server")
     parser.add_argument("--card-url", type=str, help="URL to advertise in the agent card")
     args = parser.parse_args()
+    card_url = args.card_url or os.getenv("RENDER_EXTERNAL_URL") or f"http://{args.host}:{args.port}/"
 
     # Fill in your agent card
     # See: https://a2a-protocol.org/latest/tutorials/python/3-agent-skills-and-card/
@@ -34,7 +36,7 @@ def main():
     agent_card = AgentCard(
         name="Social COMPACT Arena",
         description="Social games arena",
-        url=args.card_url or f"http://{args.host}:{args.port}/",
+        url=card_url,
         version='1.0.0',
         default_input_modes=['json'],
         default_output_modes=['json'],

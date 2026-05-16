@@ -90,7 +90,9 @@ async def start_arena_match_background(
 async def _prepare_arena_request(
     payload: StartMatchRequest,
 ) -> tuple[str, dict[str, str]]:
-    arena_url = os.getenv("SOCIALCOMPACT_ARENA_URL", "http://127.0.0.1:9009")
+    arena_url = _normalize_service_url(
+        os.getenv("SOCIALCOMPACT_ARENA_URL", "http://127.0.0.1:9009")
+    )
     player_urls = _configured_player_urls(payload)
     players = normalize_players(payload)
 
@@ -213,10 +215,27 @@ async def _run_arena_stream(
 
 def _configured_player_urls(payload: StartMatchRequest) -> list[str]:
     if payload.player_urls:
-        return [url.strip() for url in payload.player_urls if url.strip()]
+        return [_normalize_service_url(url) for url in payload.player_urls if url.strip()]
+
+    numbered_urls = [
+        os.getenv(f"SOCIALCOMPACT_PLAYER_URL_{index}", "").strip()
+        for index in range(1, 9)
+    ]
+    configured_urls = [_normalize_service_url(url) for url in numbered_urls if url]
+    if configured_urls:
+        return configured_urls
 
     env_urls = os.getenv("SOCIALCOMPACT_PLAYER_URLS", "")
-    return [url.strip() for url in env_urls.split(",") if url.strip()]
+    return [_normalize_service_url(url) for url in env_urls.split(",") if url.strip()]
+
+
+def _normalize_service_url(value: str) -> str:
+    url = value.strip()
+    if not url:
+        return url
+    if url.startswith(("http://", "https://")):
+        return url.rstrip("/")
+    return f"http://{url.rstrip('/')}"
 
 
 async def _check_agent_card(name: str, address: str) -> None:

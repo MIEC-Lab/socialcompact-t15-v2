@@ -79,3 +79,10 @@ Detailed Chinese instructions are available in:
 ```text
 docs/V2_PUBLIC_BACKEND_DEPLOYMENT.md
 ```
+
+For the real public Agent version, deploy the backend, Arena, and two Agent
+services. The step-by-step Chinese guide is available in:
+
+```text
+docs/V2_REAL_AGENT_PUBLIC_DEPLOYMENT.md
+```

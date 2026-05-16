@@ -17,6 +17,14 @@ function parseAgentUrls(value: string) {
     .filter(Boolean);
 }
 
+function getInitialUseArena() {
+  return process.env.NEXT_PUBLIC_DEFAULT_USE_ARENA === "true";
+}
+
+function getInitialAgentUrls() {
+  return process.env.NEXT_PUBLIC_DEFAULT_AGENT_URLS || "";
+}
+
 function getInitialBackendUrl() {
   if (typeof window === "undefined") {
     return getPublicApiBaseUrl();
@@ -33,10 +41,8 @@ export default function StartPage() {
   const [backendUrl, setBackendUrl] = useState(getInitialBackendUrl);
   const [playerCount, setPlayerCount] = useState("2");
   const [maxRounds, setMaxRounds] = useState("2");
-  const [useArena, setUseArena] = useState(false);
-  const [agentUrls, setAgentUrls] = useState(
-    "http://127.0.0.1:9018\nhttp://127.0.0.1:9019"
-  );
+  const [useArena, setUseArena] = useState(getInitialUseArena);
+  const [agentUrls, setAgentUrls] = useState(getInitialAgentUrls);
   const [status, setStatus] = useState(
     "Fill in the settings and click Start Match."
   );
@@ -74,7 +80,7 @@ export default function StartPage() {
           game: "Survivor",
           players: buildPlayerNames(players),
           rounds,
-          player_urls: parseAgentUrls(agentUrls),
+          player_urls: useArena ? parseAgentUrls(agentUrls) : [],
           use_arena: useArena,
         }),
       });
@@ -230,7 +236,9 @@ export default function StartPage() {
                   <span>
                     Use Arena when available
                     <span className="mt-1 block text-xs leading-5 text-slate-400">
-                      Leave this off for the built-in local Survivor simulation.
+                      Turn this on for real Agent mode. If the backend already
+                      has public Agent URLs configured, you can leave the URL
+                      box below empty.
                     </span>
                   </span>
                 </label>
@@ -246,8 +254,9 @@ export default function StartPage() {
                     className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-cyan-300"
                   />
                   <p className="mt-2 text-xs leading-5 text-slate-400">
-                    Only used when Arena mode is enabled. Put one URL per line
-                    or separate URLs with commas.
+                    Only used when Arena mode is enabled. Leave blank to use
+                    the backend&apos;s configured public Agent services, or put
+                    one custom URL per line.
                   </p>
                 </div>
 

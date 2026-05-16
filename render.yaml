@@ -2,6 +2,7 @@ services:
   - type: web
     name: socialcompact-web-backend
     runtime: python
+    plan: free
     rootDir: web-backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
@@ -9,3 +10,58 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.7
+      - key: SOCIALCOMPACT_USE_ARENA
+        value: "true"
+      - key: SOCIALCOMPACT_ARENA_URL
+        fromService:
+          name: socialcompact-arena
+          type: web
+          property: hostport
+      - key: SOCIALCOMPACT_PLAYER_URL_1
+        fromService:
+          name: socialcompact-agent-1
+          type: web
+          property: hostport
+      - key: SOCIALCOMPACT_PLAYER_URL_2
+        fromService:
+          name: socialcompact-agent-2
+          type: web
+          property: hostport
+
+  - type: web
+    name: socialcompact-arena
+    runtime: docker
+    plan: free
+    dockerfilePath: agentbeats/Arena/Dockerfile
+    dockerContext: agentbeats/Arena
+    healthCheckPath: /.well-known/agent-card.json
+
+  - type: web
+    name: socialcompact-agent-1
+    runtime: docker
+    plan: free
+    dockerfilePath: agentbeats/Agent/Dockerfile
+    dockerContext: agentbeats/Agent
+    healthCheckPath: /.well-known/agent-card.json
+    envVars:
+      - key: PLATFORM
+        value: OPENROUTER
+      - key: MODEL
+        value: openai/gpt-oss-120b:free
+      - key: API_KEY
+        sync: false
+
+  - type: web
+    name: socialcompact-agent-2
+    runtime: docker
+    plan: free
+    dockerfilePath: agentbeats/Agent/Dockerfile
+    dockerContext: agentbeats/Agent
+    healthCheckPath: /.well-known/agent-card.json
+    envVars:
+      - key: PLATFORM
+        value: OPENROUTER
+      - key: MODEL
+        value: openai/gpt-oss-120b:free
+      - key: API_KEY
+        sync: false

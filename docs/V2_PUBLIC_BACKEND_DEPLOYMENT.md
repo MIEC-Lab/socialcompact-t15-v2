@@ -4,7 +4,15 @@
 
 V2 的目标是让别人打开 Vercel 前端网页后，不需要输入你电脑上的本地端口，也能直接点击按钮开始 Survivor Game。
 
-目前推荐的 V2 范围是：
+如果只想先让网页公网可玩，可以使用本文件的 simulation 版本。
+
+如果目标是“真实 Agent 网页端可玩”，请看：
+
+```text
+docs/V2_REAL_AGENT_PUBLIC_DEPLOYMENT.md
+```
+
+本文件的推荐范围是：
 
 - 前端仍然部署在 Vercel。
 - `web-backend` 部署成一个公网 FastAPI 服务。

@@ -13,20 +13,11 @@ services:
       - key: SOCIALCOMPACT_USE_ARENA
         value: "true"
       - key: SOCIALCOMPACT_ARENA_URL
-        fromService:
-          name: socialcompact-arena
-          type: web
-          property: hostport
+        value: https://socialcompact-arena.onrender.com
       - key: SOCIALCOMPACT_PLAYER_URL_1
-        fromService:
-          name: socialcompact-agent-1
-          type: web
-          property: hostport
+        value: https://socialcompact-agent-1.onrender.com
       - key: SOCIALCOMPACT_PLAYER_URL_2
-        fromService:
-          name: socialcompact-agent-2
-          type: web
-          property: hostport
+        value: https://socialcompact-agent-2.onrender.com
 
   - type: web
     name: socialcompact-arena

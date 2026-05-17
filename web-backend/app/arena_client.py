@@ -244,12 +244,31 @@ async def _check_agent_card(name: str, address: str) -> None:
     except ImportError as exc:
         raise ArenaUnavailableError("Install httpx to check Arena services.") from exc
 
+    timeout_seconds = float(os.getenv("SOCIALCOMPACT_SERVICE_CHECK_TIMEOUT", "20"))
+    retry_attempts = int(os.getenv("SOCIALCOMPACT_SERVICE_CHECK_ATTEMPTS", "3"))
+    retry_delay_seconds = float(os.getenv("SOCIALCOMPACT_SERVICE_CHECK_DELAY", "2"))
+    card_url = urljoin(address, "/.well-known/agent-card.json")
+    last_error: Exception | None = None
+
+    # Render free services can sleep after inactivity. The first request often
+    # wakes the service but may time out, so retry before falling back.
+    for attempt in range(1, retry_attempts + 1):
+        try:
+            async with httpx.AsyncClient(timeout=timeout_seconds) as client:
+                response = await client.get(card_url)
+                response.raise_for_status()
+                return
+        except Exception as exc:
+            last_error = exc
+            if attempt < retry_attempts:
+                await asyncio.sleep(retry_delay_seconds)
+
     try:
-        async with httpx.AsyncClient(timeout=4) as client:
-            response = await client.get(urljoin(address, "/.well-known/agent-card.json"))
-            response.raise_for_status()
+        raise last_error or RuntimeError("service check failed")
     except Exception as exc:
-        raise ArenaUnavailableError(f"{name} is not reachable at {address}.") from exc
+        raise ArenaUnavailableError(
+            f"{name} is not reachable at {address} after {retry_attempts} attempt(s)."
+        ) from exc
 
 
 def _pending_arena_result(

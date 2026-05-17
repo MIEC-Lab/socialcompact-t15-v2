@@ -285,6 +285,8 @@ export function ResultsClient() {
               winner={presentation.winner}
               activePlayers={presentation.stats.activePlayers}
               eliminatedPlayers={presentation.stats.eliminatedPlayers}
+              winnerByArenaVerdict={presentation.stats.winnerByArenaVerdict}
+              hasEliminations={presentation.stats.hasEliminations}
             />
           )}
 
@@ -306,7 +308,10 @@ export function ResultsClient() {
           />
 
           <div className="grid gap-8 xl:grid-cols-[1.08fr_0.92fr]">
-            <PlayerCardGrid players={presentation.players} />
+            <PlayerCardGrid
+              players={presentation.players}
+              winnerByArenaVerdict={presentation.stats.winnerByArenaVerdict}
+            />
             <RoundTimeline rounds={roundDetails} />
           </div>
         </div>
@@ -334,6 +339,10 @@ function RunVerificationPanel({
   const hasArenaObservations = processEvents.some(
     (event) => event.phase === "observation"
   );
+  const arenaVerdictWithoutScores =
+    isArena &&
+    result.status === "completed" &&
+    result.players.every((player) => player.score === 0);
 
   return (
     <section className="grid gap-4 lg:grid-cols-3">
@@ -351,7 +360,7 @@ function RunVerificationPanel({
           isArena
             ? "The result was returned by the deployed Arena service."
             : isFallback
-              ? "Arena was unavailable, so the backend used simulation."
+              ? "Arena was unavailable, so the backend used simulation. This often happens when Render free services are waking up; retry after the Arena and Agent URLs respond."
               : "This result came from the selected backend mode."
         }
       />
@@ -360,6 +369,8 @@ function RunVerificationPanel({
         value={
           hasAgentArtifacts
             ? "Agent reasoning"
+            : arenaVerdictWithoutScores
+              ? "Arena verdict"
             : hasArenaObservations
               ? "Arena observations"
               : "System logs"
@@ -368,6 +379,8 @@ function RunVerificationPanel({
         detail={
           hasAgentArtifacts
             ? "Chat, prediction, or decision events were exposed."
+            : arenaVerdictWithoutScores
+              ? "Arena exposed a winner and public observations, but no numeric score table."
             : hasArenaObservations
               ? "Arena returned public match observations for this run."
               : "Only lifecycle messages were exposed for this run."

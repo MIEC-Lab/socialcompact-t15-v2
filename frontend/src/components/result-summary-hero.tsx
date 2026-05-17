@@ -7,6 +7,8 @@ type ResultSummaryHeroProps = {
   winner: PlayerCombatSnapshot;
   activePlayers: number;
   eliminatedPlayers: number;
+  winnerByArenaVerdict: boolean;
+  hasEliminations: boolean;
 };
 
 export function ResultSummaryHero({
@@ -14,8 +16,19 @@ export function ResultSummaryHero({
   winner,
   activePlayers,
   eliminatedPlayers,
+  winnerByArenaVerdict,
+  hasEliminations,
 }: ResultSummaryHeroProps) {
   const running = result.status === "running";
+  const isLocalFallback = result.source === "local-fallback";
+  const scoreLabel = winnerByArenaVerdict ? "Arena Verdict" : "Winner Score";
+  const scoreValue = winnerByArenaVerdict ? "WIN" : String(winner.score);
+  const scoreDetail = winnerByArenaVerdict
+    ? "Winner selected by Arena"
+    : "Highest final tally";
+  const headline = winnerByArenaVerdict
+    ? `${winner.name} wins by Arena final verdict.`
+    : `${winner.name} wins the board and owns the spotlight.`;
 
   return (
     <section className="relative overflow-hidden rounded-[40px] border border-white/10 bg-[linear-gradient(135deg,rgba(15,23,42,0.95),rgba(17,24,39,0.78)_48%,rgba(8,47,73,0.92))] p-6 shadow-[0_25px_120px_rgba(8,145,178,0.16)] sm:p-8">
@@ -47,12 +60,31 @@ export function ResultSummaryHero({
           </div>
 
           <h1 className="mt-6 max-w-4xl text-4xl font-black leading-tight text-white sm:text-5xl lg:text-6xl">
-            {winner.name} wins the board and owns the spotlight.
+            {headline}
           </h1>
 
           <p className="mt-5 max-w-3xl text-base leading-8 text-slate-200/85 sm:text-lg">
             {result.summary}
           </p>
+
+          {winnerByArenaVerdict ? (
+            <div className="mt-4 max-w-3xl rounded-2xl border border-amber-200/20 bg-amber-200/10 px-4 py-3 text-sm font-medium leading-7 text-amber-50">
+              Arena returned a final winner, but this public run did not expose
+              numeric scores. Treat the winner as the Arena&apos;s final verdict,
+              not as a highest-score calculation.
+              {!hasEliminations
+                ? " No elimination was recorded, so the match likely ended by the configured round limit."
+                : ""}
+            </div>
+          ) : null}
+
+          {isLocalFallback ? (
+            <div className="mt-4 max-w-3xl rounded-2xl border border-amber-200/20 bg-amber-200/10 px-4 py-3 text-sm font-medium leading-7 text-amber-50">
+              This is a safety fallback result, not a real Arena run. Render
+              free services may be waking up; wait briefly, confirm the Arena
+              and Agent URLs open, then start another match for a real run.
+            </div>
+          ) : null}
 
           {running ? (
             <p className="mt-4 max-w-2xl rounded-2xl border border-cyan-300/20 bg-cyan-300/10 px-4 py-3 text-sm font-medium leading-7 text-cyan-100">
@@ -78,9 +110,9 @@ export function ResultSummaryHero({
 
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
             <HeroMetric
-              label="Winner Score"
-              value={String(winner.score)}
-              detail="Highest final tally"
+              label={scoreLabel}
+              value={scoreValue}
+              detail={scoreDetail}
             />
             <HeroMetric
               label="Players Left"
@@ -118,7 +150,10 @@ export function ResultSummaryHero({
               </div>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                <SignalStat label="Score" value={String(winner.score)} />
+                <SignalStat
+                  label={winnerByArenaVerdict ? "Verdict" : "Score"}
+                  value={scoreValue}
+                />
                 <SignalStat
                   label="Eliminated"
                   value={winner.eliminated ? "YES" : "NO"}

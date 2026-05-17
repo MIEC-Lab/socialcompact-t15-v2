@@ -104,7 +104,11 @@ export default function StartPage() {
     }
 
     setIsSubmitting(true);
-    setStatus(`Starting match through ${apiBase}...`);
+    setStatus(
+      useArena && !isLocalApiBaseUrl(apiBase)
+        ? "Waking Render Arena and Agent services, then starting the match. Free Render services may take up to one minute after sleeping."
+        : `Starting match through ${apiBase}...`
+    );
 
     try {
       window.localStorage.setItem("socialcompact-api-base", apiBase);

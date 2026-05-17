@@ -1,9 +1,12 @@
 import type { MatchResult } from "@/lib/types";
 
 const ATTACK_EVENT_PATTERN = /^(.*?) attacks (.*?) for (\d+) damage\.$/;
+const HIT_EVENT_PATTERN = /^(.*?) hit (.*?)!$/;
+const LOST_LIVES_EVENT_PATTERN = /^You lost (\d+) lives\.$/;
 const ELIMINATION_EVENT_PATTERN = /^(.*?) is eliminated\.$/;
 const DISPLAY_MAX_HP = 6;
 const MIN_AMMO_CAPACITY = 6;
+const DEFAULT_ARENA_HIT_DAMAGE = 3;
 
 type NormalizedStatus =
   | "winner"
@@ -41,6 +44,9 @@ export type ResultPresentation = {
     totalEvents: number;
     playerCount: number;
     totalScore: number;
+    hasNumericScores: boolean;
+    winnerByArenaVerdict: boolean;
+    hasEliminations: boolean;
   };
 };
 
@@ -151,10 +157,20 @@ export function buildDemoFallback(matchId = "mock-match-001"): MatchResult {
 }
 
 export function buildResultPresentation(result: MatchResult): ResultPresentation {
-  const players = [...result.players].sort(
-    (left, right) => right.score - left.score || left.name.localeCompare(right.name)
-  );
+  const players = [...result.players].sort((left, right) => {
+    const winnerPriority =
+      Number(right.name === result.winner) - Number(left.name === result.winner);
+
+    return (
+      winnerPriority ||
+      right.score - left.score ||
+      left.name.localeCompare(right.name)
+    );
+  });
   const hasRoundLogs = result.round_logs.length > 0;
+  const hasNumericScores = players.some((player) => player.score !== 0);
+  const winnerByArenaVerdict =
+    result.source === "arena" && result.status === "completed" && !hasNumericScores;
   const ammoCapacity = Math.max(result.rounds + 3, MIN_AMMO_CAPACITY);
   const totals = new Map<string, CombatTotals>(
     players.map((player) => [
@@ -169,35 +185,58 @@ export function buildResultPresentation(result: MatchResult): ResultPresentation
     ])
   );
 
+  let eliminationEventCount = 0;
+
   for (const round of result.round_logs) {
+    const processedCombatLines = new Set<string>();
+
     for (const event of round.events) {
-      const attackMatch = event.match(ATTACK_EVENT_PATTERN);
-      if (attackMatch) {
-        const [, attacker, target, rawDamage] = attackMatch;
-        const damage = Number(rawDamage);
-        const attackerTotals = totals.get(attacker);
-        const targetTotals = totals.get(target);
+      const eventLines = splitEventLines(event);
+      const observedDamage = inferObservedDamage(eventLines);
 
-        if (attackerTotals) {
-          attackerTotals.shotsFired += 1;
-          attackerTotals.damageDealt += damage;
+      for (const eventLine of eventLines) {
+        const attackMatch = eventLine.match(ATTACK_EVENT_PATTERN);
+        if (attackMatch) {
+          const [, attacker, target, rawDamage] = attackMatch;
+          const damage = Number(rawDamage);
+          const combatKey = `${eventLine}:${damage}`;
+
+          if (!processedCombatLines.has(combatKey)) {
+            processedCombatLines.add(combatKey);
+            applyDamageEvent(totals, attacker, target, damage);
+          }
+
+          continue;
         }
 
-        if (targetTotals) {
-          targetTotals.damageTaken += damage;
-          targetTotals.hp -= damage;
+        const hitMatch = eventLine.match(HIT_EVENT_PATTERN);
+        if (hitMatch) {
+          const [, attacker, target] = hitMatch;
+          const damage = observedDamage ?? DEFAULT_ARENA_HIT_DAMAGE;
+          const combatKey = `${eventLine}:${damage}`;
+
+          if (!processedCombatLines.has(combatKey)) {
+            processedCombatLines.add(combatKey);
+            applyDamageEvent(totals, attacker, target, damage);
+          }
+
+          continue;
         }
 
-        continue;
-      }
+        const eliminationMatch = eventLine.match(ELIMINATION_EVENT_PATTERN);
+        if (eliminationMatch) {
+          if (processedCombatLines.has(eventLine)) {
+            continue;
+          }
 
-      const eliminationMatch = event.match(ELIMINATION_EVENT_PATTERN);
-      if (eliminationMatch) {
-        const [, target] = eliminationMatch;
-        const targetTotals = totals.get(target);
-        if (targetTotals) {
-          targetTotals.eliminated = true;
-          targetTotals.hp = 0;
+          processedCombatLines.add(eventLine);
+          eliminationEventCount += 1;
+          const [, target] = eliminationMatch;
+          const targetTotals = totals.get(target);
+          if (targetTotals) {
+            targetTotals.eliminated = true;
+            targetTotals.hp = 0;
+          }
         }
       }
     }
@@ -246,7 +285,11 @@ export function buildResultPresentation(result: MatchResult): ResultPresentation
       damageTaken: playerTotals.damageTaken,
       eliminated,
       tone,
-      insight: buildInsight(tone, statusLabel),
+      insight: buildInsight(tone, statusLabel, {
+        isWinner: player.name === result.winner,
+        winnerByArenaVerdict,
+        hasNumericScores,
+      }),
     } satisfies PlayerCombatSnapshot;
   });
 
@@ -268,11 +311,14 @@ export function buildResultPresentation(result: MatchResult): ResultPresentation
       damageTaken: 0,
       eliminated: false,
       tone: "winner",
-      insight: "Closed the match on top of the leaderboard.",
+      insight: winnerByArenaVerdict
+        ? "Selected by the Arena final verdict. Numeric scores were not exposed for this public run."
+        : "Closed the match on top of the leaderboard.",
     };
 
   const activePlayers = snapshots.filter((player) => !player.eliminated).length;
   const eliminatedPlayers = snapshots.length - activePlayers;
+  const hasEliminations = eliminatedPlayers > 0 || eliminationEventCount > 0;
   const totalEvents = result.round_logs.reduce(
     (sum, round) => sum + round.events.length,
     0
@@ -288,8 +334,51 @@ export function buildResultPresentation(result: MatchResult): ResultPresentation
       totalEvents,
       playerCount: snapshots.length,
       totalScore,
+      hasNumericScores,
+      winnerByArenaVerdict,
+      hasEliminations,
     },
   };
+}
+
+function splitEventLines(event: string) {
+  return event
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function inferObservedDamage(eventLines: string[]) {
+  const lostLivesLine = eventLines.find((eventLine) =>
+    LOST_LIVES_EVENT_PATTERN.test(eventLine)
+  );
+  const lostLivesMatch = lostLivesLine?.match(LOST_LIVES_EVENT_PATTERN);
+
+  if (!lostLivesMatch) {
+    return null;
+  }
+
+  return Number(lostLivesMatch[1]);
+}
+
+function applyDamageEvent(
+  totals: Map<string, CombatTotals>,
+  attacker: string,
+  target: string,
+  damage: number
+) {
+  const attackerTotals = totals.get(attacker);
+  const targetTotals = totals.get(target);
+
+  if (attackerTotals) {
+    attackerTotals.shotsFired += 1;
+    attackerTotals.damageDealt += damage;
+  }
+
+  if (targetTotals) {
+    targetTotals.damageTaken += damage;
+    targetTotals.hp -= damage;
+  }
 }
 
 function normalizeStatus(status: string): NormalizedStatus {
@@ -388,9 +477,23 @@ function inferFallbackShotsFired(
   return Math.min(ammoCapacity - 2, Math.max(1, safeRounds - index));
 }
 
-function buildInsight(tone: PlayerCardTone, statusLabel: string) {
+function buildInsight(
+  tone: PlayerCardTone,
+  statusLabel: string,
+  context: {
+    isWinner: boolean;
+    winnerByArenaVerdict: boolean;
+    hasNumericScores: boolean;
+  }
+) {
+  if (context.isWinner && context.winnerByArenaVerdict) {
+    return "Selected by the Arena final verdict. Numeric scoring was not included in the public artifact for this run.";
+  }
   if (tone === "winner") {
     return "Closed the arena with the cleanest finish and the strongest final score.";
+  }
+  if (!context.hasNumericScores) {
+    return `Finished with a ${statusLabel.toLowerCase()} state while the Arena result focused on final verdict instead of numeric scoring.`;
   }
   if (tone === "active") {
     return "Stayed combat-ready deep into the match and kept pressure on the board.";

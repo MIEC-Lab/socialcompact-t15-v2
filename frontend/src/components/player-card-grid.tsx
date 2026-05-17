@@ -3,9 +3,13 @@ import type { PlayerCombatSnapshot } from "./result-summary-model";
 
 type PlayerCardGridProps = {
   players: PlayerCombatSnapshot[];
+  winnerByArenaVerdict?: boolean;
 };
 
-export function PlayerCardGrid({ players }: PlayerCardGridProps) {
+export function PlayerCardGrid({
+  players,
+  winnerByArenaVerdict = false,
+}: PlayerCardGridProps) {
   return (
     <section
       id="player-status"
@@ -23,9 +27,9 @@ export function PlayerCardGrid({ players }: PlayerCardGridProps) {
               Combatant Readouts
             </h2>
             <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300">
-              HP, ammo reserve, and elimination flags are reconstructed from the
-              current result payload so this page stays presentation-ready even
-              when the backend only sends scores and status text.
+              {winnerByArenaVerdict
+                ? "The winner card is ranked first because Arena returned it as the final verdict. HP, ammo, and elimination flags are reconstructed from public match artifacts when numeric scoring is limited."
+                : "HP, ammo reserve, and elimination flags are reconstructed from the current result payload so this page stays presentation-ready even when the backend only sends scores and status text."}
             </p>
           </div>
 

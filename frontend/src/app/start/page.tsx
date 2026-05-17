@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getPublicApiBaseUrl, normalizeApiBaseUrl } from "@/lib/api";
+import {
+  getPublicApiBaseUrl,
+  isLocalApiBaseUrl,
+  normalizeApiBaseUrl,
+} from "@/lib/api";
 import type { MatchCreateResponse } from "@/lib/types";
 
 function buildPlayerNames(playerCount: number) {
@@ -26,27 +30,61 @@ function getInitialAgentUrls() {
 }
 
 function getInitialBackendUrl() {
+  const publicApiBaseUrl = getPublicApiBaseUrl();
+
   if (typeof window === "undefined") {
-    return getPublicApiBaseUrl();
+    return publicApiBaseUrl;
   }
 
-  return (
-    window.localStorage.getItem("socialcompact-api-base") ||
-    getPublicApiBaseUrl()
-  );
+  const savedApiBaseUrl = window.localStorage.getItem("socialcompact-api-base");
+
+  if (!savedApiBaseUrl) {
+    return publicApiBaseUrl;
+  }
+
+  const normalizedSavedApiBaseUrl = normalizeApiBaseUrl(savedApiBaseUrl);
+
+  // A stale localhost value is common after local testing. Prefer the deployed
+  // backend when Vercel has one configured so public demos work without editing.
+  if (
+    isLocalApiBaseUrl(normalizedSavedApiBaseUrl) &&
+    !isLocalApiBaseUrl(publicApiBaseUrl)
+  ) {
+    return publicApiBaseUrl;
+  }
+
+  return normalizedSavedApiBaseUrl;
 }
 
 export default function StartPage() {
   const router = useRouter();
   const [backendUrl, setBackendUrl] = useState(getInitialBackendUrl);
   const [playerCount, setPlayerCount] = useState("2");
-  const [maxRounds, setMaxRounds] = useState("2");
+  const [maxRounds, setMaxRounds] = useState("1");
   const [useArena, setUseArena] = useState(getInitialUseArena);
   const [agentUrls, setAgentUrls] = useState(getInitialAgentUrls);
   const [status, setStatus] = useState(
     "Fill in the settings and click Start Match."
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const normalizedBackendUrl = normalizeApiBaseUrl(backendUrl);
+  const publicBackendUrl = getPublicApiBaseUrl();
+  const backendIsPublic = !isLocalApiBaseUrl(normalizedBackendUrl);
+  const publicBackendConfigured = !isLocalApiBaseUrl(publicBackendUrl);
+  const runModeLabel =
+    useArena && backendIsPublic
+      ? "Public Real Agent"
+      : useArena
+        ? "Local Arena"
+        : "Local Simulation";
+
+  function usePublicBackend() {
+    setBackendUrl(publicBackendUrl);
+    setUseArena(true);
+    setAgentUrls("");
+    window.localStorage.setItem("socialcompact-api-base", publicBackendUrl);
+    setStatus("Public Render backend selected. Start a match when ready.");
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -146,10 +184,11 @@ export default function StartPage() {
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
               <div className="rounded-3xl border border-white/10 bg-white/6 p-5 backdrop-blur">
                 <p className="text-sm font-semibold text-cyan-300">
-                  Current Goal
+                  Current Mode
                 </p>
                 <p className="mt-3 text-sm leading-7 text-slate-300">
-                  Send a real backend request and persist a match result by id.
+                  {runModeLabel}. Use the deployed backend for a shareable
+                  browser demo.
                 </p>
               </div>
 
@@ -158,8 +197,9 @@ export default function StartPage() {
                   Backend Status
                 </p>
                 <p className="mt-3 text-sm leading-7 text-slate-300">
-                  Uses local simulation by default; can call Arena when agent
-                  URLs are online.
+                  {backendIsPublic
+                    ? "Connected to a public Render backend."
+                    : "Using localhost. Only your computer can reach this backend."}
                 </p>
               </div>
             </div>
@@ -176,6 +216,26 @@ export default function StartPage() {
                   <label className="mb-2 block text-sm font-medium text-slate-200">
                     Backend URL
                   </label>
+                  <div className="mb-3 flex flex-wrap items-center gap-2">
+                    <span
+                      className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${
+                        backendIsPublic
+                          ? "border-emerald-300/25 bg-emerald-300/10 text-emerald-100"
+                          : "border-amber-300/25 bg-amber-300/10 text-amber-100"
+                      }`}
+                    >
+                      {backendIsPublic ? "Public backend" : "Local backend"}
+                    </span>
+                    {publicBackendConfigured ? (
+                      <button
+                        type="button"
+                        onClick={usePublicBackend}
+                        className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100 transition hover:border-cyan-200/60 hover:bg-cyan-300/15"
+                      >
+                        Use Render backend
+                      </button>
+                    ) : null}
+                  </div>
                   <input
                     value={backendUrl}
                     onChange={(event) => setBackendUrl(event.target.value)}
@@ -185,7 +245,8 @@ export default function StartPage() {
                   <p className="mt-2 text-xs leading-5 text-slate-400">
                     If the backend runs on your computer, use
                     http://127.0.0.1:8000. If it is deployed online, paste that
-                    public backend URL here.
+                    public backend URL here. For this project, use the Render
+                    URL during public demos.
                   </p>
                 </div>
 

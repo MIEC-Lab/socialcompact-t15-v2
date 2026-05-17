@@ -38,6 +38,13 @@ function formatTime(value: string) {
 
 export function GameProcessLog({ events, isPolling }: GameProcessLogProps) {
   const visibleEvents = events.slice(-80);
+  const chatLikeCount = events.filter((event) =>
+    ["chat", "reasoning", "prediction", "decision"].includes(event.phase)
+  ).length;
+  const observationCount = events.filter(
+    (event) => event.phase === "observation"
+  ).length;
+  const systemCount = events.filter((event) => event.phase === "system").length;
 
   return (
     <section className="rounded-[32px] border border-white/10 bg-[linear-gradient(135deg,rgba(15,23,42,0.92),rgba(8,47,73,0.72))] p-6 shadow-[0_22px_90px_rgba(8,145,178,0.12)] backdrop-blur">
@@ -55,10 +62,24 @@ export function GameProcessLog({ events, isPolling }: GameProcessLogProps) {
           </p>
         </div>
 
-        <div className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-100">
-          {isPolling ? "Polling On" : "Final Logs"}
+        <div className="flex flex-wrap gap-2">
+          <LogCounter label="System" value={systemCount} />
+          <LogCounter label="Agent" value={chatLikeCount} />
+          <LogCounter label="Arena" value={observationCount} />
+          <div className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-100">
+            {isPolling ? "Polling On" : "Final Logs"}
+          </div>
         </div>
       </div>
+
+      {events.length > 0 && chatLikeCount === 0 ? (
+        <div className="mt-5 rounded-2xl border border-amber-200/20 bg-amber-200/10 px-5 py-4 text-sm leading-6 text-amber-50">
+          The public Arena returned final observations and match events, but it
+          did not expose full chat, prediction, or decision text for this run.
+          The match is still using the real Arena stack; the visible log stream
+          depends on which artifacts Arena emits.
+        </div>
+      ) : null}
 
       {visibleEvents.length === 0 ? (
         <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-sm leading-6 text-slate-300">
@@ -102,5 +123,13 @@ export function GameProcessLog({ events, isPolling }: GameProcessLogProps) {
         </div>
       )}
     </section>
+  );
+}
+
+function LogCounter({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-full border border-white/10 bg-white/6 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-200">
+      {label}: {value}
+    </div>
   );
 }

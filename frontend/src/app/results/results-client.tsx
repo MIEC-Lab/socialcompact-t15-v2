@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getPublicApiBaseUrl, normalizeApiBaseUrl } from "@/lib/api";
+import {
+  getPublicApiBaseUrl,
+  isLocalApiBaseUrl,
+  normalizeApiBaseUrl,
+} from "@/lib/api";
 import type { GameLogEvent, MatchLogsResponse, MatchResult } from "@/lib/types";
 import { GameProcessLog } from "@/components/game-process-log";
 import { PlayerCardGrid } from "@/components/player-card-grid";
@@ -230,6 +234,7 @@ export function ResultsClient() {
   const isRunning = displayResult.status === "running";
   const isFailed = displayResult.status === "failed";
   const roundDetails = convertRoundLogsToDetails(displayResult.round_logs);
+  const backendIsPublic = !isLocalApiBaseUrl(apiBase);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.16),transparent_24%),radial-gradient(circle_at_82%_12%,rgba(250,204,21,0.12),transparent_18%),linear-gradient(135deg,#020617,#0f172a_45%,#111827)] text-white">
@@ -288,6 +293,13 @@ export function ResultsClient() {
             stats={presentation.stats}
           />
 
+          <RunVerificationPanel
+            result={displayResult}
+            apiBase={apiBase}
+            backendIsPublic={backendIsPublic}
+            processEvents={processEvents}
+          />
+
           <GameProcessLog
             events={processEvents}
             isPolling={displayResult.status === "running"}
@@ -300,6 +312,101 @@ export function ResultsClient() {
         </div>
       </section>
     </main>
+  );
+}
+
+function RunVerificationPanel({
+  result,
+  apiBase,
+  backendIsPublic,
+  processEvents,
+}: {
+  result: MatchResult;
+  apiBase: string;
+  backendIsPublic: boolean;
+  processEvents: GameLogEvent[];
+}) {
+  const isArena = result.source === "arena";
+  const isFallback = result.source === "local-fallback";
+  const hasAgentArtifacts = processEvents.some((event) =>
+    ["chat", "reasoning", "prediction", "decision"].includes(event.phase)
+  );
+  const hasArenaObservations = processEvents.some(
+    (event) => event.phase === "observation"
+  );
+
+  return (
+    <section className="grid gap-4 lg:grid-cols-3">
+      <VerificationCard
+        label="Backend"
+        value={backendIsPublic ? "Public Render" : "Localhost"}
+        tone={backendIsPublic ? "good" : "warn"}
+        detail={apiBase}
+      />
+      <VerificationCard
+        label="Run Source"
+        value={isArena ? "Real Arena" : isFallback ? "Fallback" : result.source}
+        tone={isArena ? "good" : isFallback ? "warn" : "neutral"}
+        detail={
+          isArena
+            ? "The result was returned by the deployed Arena service."
+            : isFallback
+              ? "Arena was unavailable, so the backend used simulation."
+              : "This result came from the selected backend mode."
+        }
+      />
+      <VerificationCard
+        label="Visible Artifacts"
+        value={
+          hasAgentArtifacts
+            ? "Agent reasoning"
+            : hasArenaObservations
+              ? "Arena observations"
+              : "System logs"
+        }
+        tone={hasAgentArtifacts || hasArenaObservations ? "good" : "neutral"}
+        detail={
+          hasAgentArtifacts
+            ? "Chat, prediction, or decision events were exposed."
+            : hasArenaObservations
+              ? "Arena returned public match observations for this run."
+              : "Only lifecycle messages were exposed for this run."
+        }
+      />
+    </section>
+  );
+}
+
+function VerificationCard({
+  label,
+  value,
+  detail,
+  tone,
+}: {
+  label: string;
+  value: string;
+  detail: string;
+  tone: "good" | "warn" | "neutral";
+}) {
+  const toneClassName =
+    tone === "good"
+      ? "border-emerald-300/18 bg-[linear-gradient(135deg,rgba(16,185,129,0.16),rgba(15,23,42,0.72))]"
+      : tone === "warn"
+        ? "border-amber-300/18 bg-[linear-gradient(135deg,rgba(251,191,36,0.16),rgba(15,23,42,0.72))]"
+        : "border-slate-300/14 bg-white/6";
+
+  return (
+    <article
+      className={`rounded-[28px] border p-5 shadow-[0_18px_60px_rgba(2,6,23,0.2)] ${toneClassName}`}
+    >
+      <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/65">
+        {label}
+      </p>
+      <p className="mt-3 text-2xl font-black text-white">{value}</p>
+      <p className="mt-3 break-words text-sm leading-6 text-slate-200/78">
+        {detail}
+      </p>
+    </article>
   );
 }
 

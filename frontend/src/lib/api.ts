@@ -1,4 +1,5 @@
 export const DEFAULT_API_BASE_URL = "http://127.0.0.1:8000";
+const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
 
 export function normalizeApiBaseUrl(value: string) {
   const trimmedValue = value.trim();
@@ -24,4 +25,13 @@ export function getServerApiBaseUrl() {
     process.env.NEXT_PUBLIC_API_BASE_URL ||
     DEFAULT_API_BASE_URL
   );
+}
+
+export function isLocalApiBaseUrl(value: string) {
+  try {
+    const url = new URL(normalizeApiBaseUrl(value));
+    return LOCAL_HOSTS.has(url.hostname);
+  } catch {
+    return false;
+  }
 }

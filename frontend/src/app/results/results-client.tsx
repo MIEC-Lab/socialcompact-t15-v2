@@ -276,7 +276,10 @@ export function ResultsClient() {
 
         <div className="mt-8 space-y-8">
           {isRunning ? (
-            <RunningResultHero result={displayResult} />
+            <RunningAgentConversationHero
+              result={displayResult}
+              processEvents={processEvents}
+            />
           ) : isFailed ? (
             <FailedResultHero result={displayResult} />
           ) : (
@@ -600,34 +603,142 @@ function MissingResult({
   );
 }
 
-function RunningResultHero({ result }: { result: MatchResult }) {
+function RunningAgentConversationHero({
+  result,
+  processEvents,
+}: {
+  result: MatchResult;
+  processEvents: GameLogEvent[];
+}) {
+  const agentEvents = processEvents.filter((event) =>
+    ["chat", "prediction", "decision"].includes(event.phase)
+  );
+  const visibleAgentEvents = agentEvents.slice(-6);
+  const latestSystemEvent = [...processEvents]
+    .reverse()
+    .find((event) => event.phase === "system");
+  const lastAgentEvent = agentEvents[agentEvents.length - 1];
+  const statusText =
+    lastAgentEvent !== undefined
+      ? `${formatPhaseLabel(lastAgentEvent.phase)} from ${lastAgentEvent.actor ?? "Agent"}`
+      : latestSystemEvent?.message ?? result.summary;
+
   return (
-    <section className="rounded-[36px] border border-cyan-300/20 bg-[linear-gradient(145deg,rgba(14,165,233,0.18),rgba(15,23,42,0.88))] p-8 shadow-2xl shadow-cyan-950/30 backdrop-blur">
-      <div className="flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/90">
-        <span className="rounded-full border border-cyan-300/30 bg-cyan-300/10 px-4 py-2">
-          Match Running
+    <section className="relative overflow-hidden rounded-[36px] border border-cyan-300/20 bg-[linear-gradient(145deg,rgba(14,165,233,0.16),rgba(15,23,42,0.9)_54%,rgba(6,78,59,0.28))] p-6 shadow-2xl shadow-cyan-950/30 backdrop-blur sm:p-8">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_12%,rgba(34,211,238,0.16),transparent_32%),radial-gradient(circle_at_88%_24%,rgba(16,185,129,0.12),transparent_26%)]" />
+      <div className="relative grid gap-6 xl:grid-cols-[0.92fr_1.08fr] xl:items-stretch">
+        <div className="flex flex-col justify-between">
+          <div>
+            <div className="flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/90">
+              <span className="rounded-full border border-cyan-300/30 bg-cyan-300/10 px-4 py-2">
+                Live Agent Exchange
+              </span>
+              <span className="rounded-full border border-white/10 bg-white/6 px-4 py-2 text-slate-200">
+                Match {result.match_id}
+              </span>
+              <span className="rounded-full border border-emerald-300/25 bg-emerald-300/10 px-4 py-2 text-emerald-100">
+                {result.source}
+              </span>
+            </div>
+
+            <h1 className="mt-6 max-w-3xl text-4xl font-black leading-tight text-white sm:text-5xl">
+              Agents are negotiating in real time.
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
+              {statusText}
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-3 sm:grid-cols-3">
+            <LiveMetric label="Agent Events" value={String(agentEvents.length)} />
+            <LiveMetric label="Latest Round" value={String(lastAgentEvent?.round ?? 0)} />
+            <LiveMetric label="Refresh" value="3s" />
+          </div>
+        </div>
+
+        <div className="rounded-[30px] border border-white/10 bg-slate-950/50 p-4 shadow-[0_18px_80px_rgba(2,6,23,0.28)] sm:p-5">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.26em] text-cyan-300">
+                Conversation Stream
+              </p>
+              <h2 className="mt-2 text-2xl font-bold text-white">
+                Latest Agent Messages
+              </h2>
+            </div>
+            <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-100">
+              Live
+            </span>
+          </div>
+
+          {visibleAgentEvents.length === 0 ? (
+            <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-sm leading-7 text-slate-300">
+              Waiting for the first Agent chat or decision artifact. Service
+              wake-up and Arena setup messages continue below in the process log.
+            </div>
+          ) : (
+            <div className="mt-5 max-h-[27rem] space-y-3 overflow-y-auto pr-2">
+              {visibleAgentEvents.map((event) => (
+                <LiveAgentMessage key={event.id} event={event} />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function formatPhaseLabel(phase: string) {
+  if (phase === "chat") {
+    return "Chat";
+  }
+  if (phase === "prediction") {
+    return "Prediction";
+  }
+  if (phase === "decision") {
+    return "Decision";
+  }
+  return phase.replace(/_/g, " ");
+}
+
+function LiveMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/6 p-4">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+        {label}
+      </p>
+      <p className="mt-2 text-2xl font-black text-white">{value}</p>
+    </div>
+  );
+}
+
+function LiveAgentMessage({ event }: { event: GameLogEvent }) {
+  const isChat = event.phase === "chat";
+  const toneClassName = isChat
+    ? "border-cyan-300/18 bg-cyan-300/10"
+    : event.phase === "prediction"
+      ? "border-amber-300/18 bg-amber-300/10"
+      : "border-rose-300/18 bg-rose-300/10";
+
+  return (
+    <article className={`rounded-2xl border px-4 py-3 ${toneClassName}`}>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="rounded-full border border-white/10 bg-slate-950/35 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-slate-200">
+          {formatPhaseLabel(event.phase)}
         </span>
-        <span className="rounded-full border border-white/10 bg-white/6 px-4 py-2 text-slate-200">
-          Match {result.match_id}
+        <span className="rounded-full border border-white/10 bg-slate-950/35 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-slate-300">
+          Round {event.round}
         </span>
-        <span className="rounded-full border border-emerald-300/25 bg-emerald-300/10 px-4 py-2 text-emerald-100">
-          {result.source}
+        <span className="text-sm font-semibold text-cyan-100">
+          {event.actor ?? "Agent"}
+          {event.target ? ` -> ${event.target}` : ""}
         </span>
       </div>
-
-      <h1 className="mt-6 max-w-4xl text-4xl font-black leading-tight text-white sm:text-5xl lg:text-6xl">
-        The match is queued or running.
-      </h1>
-      <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
-        {result.summary}
+      <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-7 text-slate-100">
+        {event.message}
       </p>
-      <p className="mt-5 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 px-5 py-4 text-sm leading-7 text-cyan-50">
-        The page refreshes every 3 seconds while the backend wakes Render
-        services, checks Agent cards, and listens for Arena artifacts. A winner
-        appears after the backend returns{" "}
-        <span className="font-mono">status=completed</span>.
-      </p>
-    </section>
+    </article>
   );
 }
 

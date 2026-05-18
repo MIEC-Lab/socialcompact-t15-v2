@@ -1,3 +1,4 @@
+import asyncio
 import difflib
 
 from a2a.server.tasks import TaskUpdater
@@ -27,6 +28,11 @@ class Agent:
         self.predictions = {}
         self.action = None
         self.history = "The game has just begun, nothing has happened yet."
+        self.model_lock = asyncio.Lock()
+
+    async def call_model(self, instruction):
+        async with self.model_lock:
+            return str(await asyncio.to_thread(self.model, instruction))
 
     async def run(self, message: Message, updater: TaskUpdater) -> None:
         """Implement your agent logic here.
@@ -74,7 +80,7 @@ class Agent:
             self.chats[interlocutor].append(new_message)
             # Get LLM response
             instruction = [{"role": "user", "content": prompt}]
-            response = str(self.model(instruction))
+            response = await self.call_model(instruction)
             print(response)
             self.chats[interlocutor].append({"from": self.name, "to": interlocutor, "message": response})
             await updater.update_status(
@@ -94,7 +100,7 @@ class Agent:
                       "\nChats this round:\n" + json.dumps(self.chats) + "\n" + str(incoming["message"]))
             # Get LLM response
             instruction = [{"role": "user", "content": prompt}]
-            response = str(self.model(instruction))
+            response = await self.call_model(instruction)
             print(response)
             self.predictions[subject] = response
             await updater.update_status(
@@ -111,7 +117,7 @@ class Agent:
                       "\n" + str(incoming["message"]))
             # Get LLM response
             instruction = [{"role": "user", "content": prompt}]
-            response = str(self.model(instruction))
+            response = await self.call_model(instruction)
             print(response)
             self.action = response
             await updater.update_status(
@@ -130,7 +136,7 @@ class Agent:
                       "Be concise and include lessons for future decisions in the game.")
             # Get LLM response
             instruction = [{"role": "user", "content": prompt}]
-            response = self.model(instruction)
+            response = await self.call_model(instruction)
             print(response)
             if response is not None:
                 self.history = str(response)

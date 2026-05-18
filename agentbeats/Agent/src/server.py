@@ -11,8 +11,13 @@ from a2a.types import (
     AgentCard,
     AgentSkill,
 )
+from starlette.responses import JSONResponse
 
 from agent_executor import Executor
+
+
+async def health(_request):
+    return JSONResponse({"status": "ok", "service": "socialcompact-agent"})
 
 
 def main():
@@ -69,7 +74,10 @@ def main():
         agent_card=agent_card,
         http_handler=request_handler,
     )
-    uvicorn.run(server.build(), host=args.host, port=args.port)
+    app = server.build()
+    app.add_route("/health", health, methods=["GET", "HEAD"])
+    app.add_route("/", health, methods=["GET", "HEAD"])
+    uvicorn.run(app, host=args.host, port=args.port)
 
 
 if __name__ == '__main__':

@@ -33,7 +33,7 @@ services:
     plan: free
     dockerfilePath: agentbeats/Agent/Dockerfile
     dockerContext: agentbeats/Agent
-    healthCheckPath: /.well-known/agent-card.json
+    healthCheckPath: /health
     envVars:
       - key: PLATFORM
         value: OPENROUTER
@@ -48,7 +48,7 @@ services:
     plan: free
     dockerfilePath: agentbeats/Agent/Dockerfile
     dockerContext: agentbeats/Agent
-    healthCheckPath: /.well-known/agent-card.json
+    healthCheckPath: /health
     envVars:
       - key: PLATFORM
         value: OPENROUTER

@@ -8,7 +8,7 @@ from collections.abc import Callable
 from urllib.parse import urljoin
 
 from app.schemas import GameLogEvent, MatchResultResponse, PlayerResult, RoundLog, StartMatchRequest
-from app.simulator import normalize_players
+from app.simulator import normalize_players, run_local_match
 
 
 class ArenaUnavailableError(RuntimeError):
@@ -40,14 +40,14 @@ async def start_arena_match_background(
     append_log: LogAppender | None = None,
     replace_logs: LogReplacer | None = None,
 ) -> MatchResultResponse:
-    arena_url, participants = await _prepare_arena_request(payload)
+    participants = _preview_participants(payload)
     pending = _pending_arena_result(payload, match_id, participants)
-    print(f"[arena] accepted {match_id}; listening for stream artifacts")
+    print(f"[arena] queued {match_id}; service checks will run in background")
     if append_log is not None:
         append_log(
             match_id,
             "system",
-            f"Arena accepted the request with {len(participants)} participant(s).",
+            "Arena match queued. The backend will check Render Arena and Agent services in the background.",
             0,
             None,
             None,
@@ -55,26 +55,97 @@ async def start_arena_match_background(
 
     async def runner() -> None:
         try:
-            result = await _run_arena_stream(
-                payload,
-                match_id,
-                arena_url,
-                participants,
-                append_log,
-                replace_logs,
-            )
-        except Exception as exc:
-            print(f"[arena] {match_id} failed: {exc}")
-            if append_log is not None:
-                append_log(match_id, "system", f"Arena run failed: {exc}", 0, None, None)
-            result = _failed_arena_result(payload, match_id, participants, str(exc))
-        else:
-            print(f"[arena] {match_id} finished with status={result.status}")
             if append_log is not None:
                 append_log(
                     match_id,
                     "system",
-                    f"Arena stream finished with status={result.status}.",
+                    "Checking Arena and Agent service cards. Sleeping Render services may need time to wake up.",
+                    0,
+                    None,
+                    None,
+                )
+            arena_url, prepared_participants = await _prepare_arena_request(payload)
+            if append_log is not None:
+                append_log(
+                    match_id,
+                    "system",
+                    f"Arena services are reachable. Starting the A2A stream with {len(prepared_participants)} participant(s).",
+                    0,
+                    None,
+                    None,
+                )
+            result = await _run_arena_stream(
+                payload,
+                match_id,
+                arena_url,
+                prepared_participants,
+                append_log,
+                replace_logs,
+            )
+            if result.status == "running":
+                detail = "Arena stream ended before a final result artifact was emitted."
+                print(f"[arena] {match_id} incomplete: {detail}")
+                if append_log is not None:
+                    append_log(
+                        match_id,
+                        "system",
+                        f"{detail} Falling back to local simulation so the demo can finish.",
+                        0,
+                        None,
+                        None,
+                    )
+                result = run_local_match(
+                    payload,
+                    match_id,
+                    source="local-fallback",
+                    note=detail,
+                )
+        except ArenaUnavailableError as exc:
+            print(f"[arena] {match_id} unavailable: {exc}")
+            if append_log is not None:
+                append_log(
+                    match_id,
+                    "system",
+                    f"Arena unavailable after background checks. Falling back to local simulation: {exc}",
+                    0,
+                    None,
+                    None,
+                )
+            result = run_local_match(
+                payload,
+                match_id,
+                source="local-fallback",
+                note=f"Arena was unavailable: {exc}",
+            )
+        except Exception as exc:
+            print(f"[arena] {match_id} failed: {exc}")
+            if append_log is not None:
+                append_log(
+                    match_id,
+                    "system",
+                    f"Arena run failed. Falling back to local simulation: {exc}",
+                    0,
+                    None,
+                    None,
+                )
+            result = run_local_match(
+                payload,
+                match_id,
+                source="local-fallback",
+                note=f"Arena run failed: {exc}",
+            )
+        else:
+            print(f"[arena] {match_id} finished with source={result.source} status={result.status}")
+            if append_log is not None:
+                message = (
+                    f"Arena stream finished with status={result.status}."
+                    if result.source == "arena"
+                    else f"Background run finished with source={result.source} and status={result.status}."
+                )
+                append_log(
+                    match_id,
+                    "system",
+                    message,
                     0,
                     None,
                     None,
@@ -85,6 +156,26 @@ async def start_arena_match_background(
     BACKGROUND_ARENA_TASKS.add(task)
     task.add_done_callback(BACKGROUND_ARENA_TASKS.discard)
     return pending
+
+
+def _preview_participants(payload: StartMatchRequest) -> dict[str, str]:
+    players = normalize_players(payload)
+    player_urls = _configured_player_urls(payload)
+
+    if len(player_urls) < 2:
+        return {
+            player: (
+                player_urls[index]
+                if index < len(player_urls)
+                else "configured-by-backend"
+            )
+            for index, player in enumerate(players)
+        }
+
+    return {
+        players[index] if index < len(players) else f"Player{index + 1}": url
+        for index, url in enumerate(player_urls)
+    }
 
 
 async def _prepare_arena_request(

@@ -83,7 +83,9 @@ export default function StartPage() {
     setUseArena(true);
     setAgentUrls("");
     window.localStorage.setItem("socialcompact-api-base", publicBackendUrl);
-    setStatus("Public Render backend selected. Start a match when ready.");
+    setStatus(
+      "Public Render backend selected. Real Agent mode is on; the results page will keep updating while services wake up."
+    );
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -106,7 +108,7 @@ export default function StartPage() {
     setIsSubmitting(true);
     setStatus(
       useArena && !isLocalApiBaseUrl(apiBase)
-        ? "Waking Render Arena and Agent services, then starting the match. Free Render services may take up to one minute after sleeping."
+        ? "Queueing a real Agent match on the public backend. The next page will show wake-up and run progress."
         : `Starting match through ${apiBase}...`
     );
 
@@ -143,7 +145,9 @@ export default function StartPage() {
       const message =
         error instanceof Error ? error.message : "Unable to start match.";
       setStatus(
-        `Could not reach the backend. Start web-backend first, then try again. ${message}`
+        backendIsPublic
+          ? `Could not reach the public backend. Render may still be waking up; wait briefly and try again. ${message}`
+          : `Could not reach the backend. Start web-backend first, then try again. ${message}`
       );
       setIsSubmitting(false);
     }
@@ -202,7 +206,7 @@ export default function StartPage() {
                 </p>
                 <p className="mt-3 text-sm leading-7 text-slate-300">
                   {backendIsPublic
-                    ? "Connected to a public Render backend."
+                    ? "Connected to a public Render backend. Match creation returns quickly and continues in the results view."
                     : "Using localhost. Only your computer can reach this backend."}
                 </p>
               </div>
@@ -330,7 +334,7 @@ export default function StartPage() {
                   disabled={isSubmitting}
                   className="w-full rounded-full bg-cyan-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {isSubmitting ? "Starting..." : "Start Match"}
+                  {isSubmitting ? "Queueing..." : "Start Match"}
                 </button>
 
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">

@@ -40,7 +40,7 @@ async def create_match(payload: StartMatchRequest) -> MatchCreateResponse:
 
     if should_use_arena(payload):
         try:
-            append_match_log(match_id, "system", "Arena mode requested. Checking Arena and Agent services.")
+            append_match_log(match_id, "system", "Arena mode requested. Queueing real Agent run.")
             result = await start_arena_match_background(
                 payload,
                 match_id,
@@ -66,7 +66,7 @@ async def create_match(payload: StartMatchRequest) -> MatchCreateResponse:
         id=match_id,
         game=result.game,
         rounds=result.rounds,
-        player_count=len(players),
+        player_count=len(result.players) or len(players),
         status=result.status,
         message=_create_message(result),
         source=result.source,
@@ -195,7 +195,7 @@ def build_logs_from_result(
 
 def _create_message(result: MatchResultResponse) -> str:
     if result.status == "running":
-        return "Arena match request was sent. Results are still running."
+        return "Arena match was queued. The results page will keep polling while Render services wake and the Agent run continues."
     if result.source == "local-fallback":
         return "Arena was unavailable, so a local simulation result was created."
     if result.source == "arena":

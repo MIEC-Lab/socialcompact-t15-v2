@@ -83,8 +83,8 @@ export function GameProcessLog({ events, isPolling }: GameProcessLogProps) {
 
       {visibleEvents.length === 0 ? (
         <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-sm leading-6 text-slate-300">
-          No live process logs yet. If Arena mode is running, this section will
-          update automatically as the backend receives stream artifacts.
+          No live process logs yet. When Arena mode is queued, this section will
+          update as the backend checks services and receives stream artifacts.
         </div>
       ) : (
         <div className="mt-6 max-h-[34rem] space-y-3 overflow-y-auto pr-2">

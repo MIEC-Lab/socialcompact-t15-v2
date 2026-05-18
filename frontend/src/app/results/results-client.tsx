@@ -302,6 +302,10 @@ export function ResultsClient() {
             processEvents={processEvents}
           />
 
+          {isRunning ? (
+            <RunningProgressPanel processEvents={processEvents} />
+          ) : null}
+
           <GameProcessLog
             events={processEvents}
             isPolling={displayResult.status === "running"}
@@ -317,6 +321,116 @@ export function ResultsClient() {
         </div>
       </section>
     </main>
+  );
+}
+
+function RunningProgressPanel({
+  processEvents,
+}: {
+  processEvents: GameLogEvent[];
+}) {
+  const messages = processEvents.map((event) => event.message.toLowerCase());
+  const latestEvent = processEvents[processEvents.length - 1];
+  const stages = [
+    {
+      label: "Queued",
+      active: messages.some(
+        (message) =>
+          message.includes("match created") || message.includes("queued")
+      ),
+      detail: "The backend created a match id and saved the initial running result.",
+    },
+    {
+      label: "Service Check",
+      active: messages.some(
+        (message) =>
+          message.includes("checking arena") ||
+          message.includes("service cards")
+      ),
+      detail: "Render Arena and Agent services are being checked and woken up.",
+    },
+    {
+      label: "A2A Stream",
+      active: messages.some(
+        (message) =>
+          message.includes("starting the a2a stream") ||
+          message.includes("stream event")
+      ),
+      detail: "The backend is listening for Arena artifacts and live events.",
+    },
+    {
+      label: "Final Artifact",
+      active: messages.some(
+        (message) =>
+          message.includes("stream finished") ||
+          message.includes("falling back") ||
+          message.includes("match completed")
+      ),
+      detail: "The final result will replace the running snapshot once available.",
+    },
+  ];
+  const currentStage =
+    [...stages].reverse().find((stage) => stage.active)?.label ?? "Waiting";
+
+  return (
+    <section className="rounded-[32px] border border-cyan-300/16 bg-[linear-gradient(135deg,rgba(14,165,233,0.16),rgba(15,23,42,0.82))] p-6 shadow-[0_22px_90px_rgba(8,145,178,0.12)] backdrop-blur">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-cyan-300">
+            Real Agent Run Progress
+          </p>
+          <h2 className="mt-2 text-2xl font-bold text-white">
+            Current Stage: {currentStage}
+          </h2>
+        </div>
+        <p className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-100">
+          Polling Every 3s
+        </p>
+      </div>
+
+      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        {stages.map((stage) => (
+          <ProgressStageCard key={stage.label} stage={stage} />
+        ))}
+      </div>
+
+      {latestEvent ? (
+        <div className="mt-5 rounded-2xl border border-white/10 bg-slate-950/42 px-5 py-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+            Latest Signal
+          </p>
+          <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-slate-200">
+            {latestEvent.message}
+          </p>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function ProgressStageCard({
+  stage,
+}: {
+  stage: { label: string; active: boolean; detail: string };
+}) {
+  return (
+    <article
+      className={`rounded-2xl border px-4 py-4 ${
+        stage.active
+          ? "border-emerald-300/20 bg-emerald-300/10"
+          : "border-white/10 bg-white/5"
+      }`}
+    >
+      <p
+        className={`text-xs font-semibold uppercase tracking-[0.2em] ${
+          stage.active ? "text-emerald-100" : "text-slate-400"
+        }`}
+      >
+        {stage.active ? "Active" : "Waiting"}
+      </p>
+      <p className="mt-2 text-lg font-bold text-white">{stage.label}</p>
+      <p className="mt-2 text-sm leading-6 text-slate-300">{stage.detail}</p>
+    </article>
   );
 }
 
@@ -502,14 +616,16 @@ function RunningResultHero({ result }: { result: MatchResult }) {
       </div>
 
       <h1 className="mt-6 max-w-4xl text-4xl font-black leading-tight text-white sm:text-5xl lg:text-6xl">
-        The match is still running.
+        The match is queued or running.
       </h1>
       <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
         {result.summary}
       </p>
       <p className="mt-5 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 px-5 py-4 text-sm leading-7 text-cyan-50">
-        The page refreshes every 3 seconds. A winner will only be shown after
-        the backend returns <span className="font-mono">status=completed</span>.
+        The page refreshes every 3 seconds while the backend wakes Render
+        services, checks Agent cards, and listens for Arena artifacts. A winner
+        appears after the backend returns{" "}
+        <span className="font-mono">status=completed</span>.
       </p>
     </section>
   );

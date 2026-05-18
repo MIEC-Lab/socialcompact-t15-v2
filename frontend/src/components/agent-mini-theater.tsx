@@ -318,36 +318,94 @@ function StickAgent({
 }) {
   const toneClassName =
     tone === "cyan"
-      ? "border-cyan-200/35 bg-cyan-300/12 text-cyan-100"
-      : "border-emerald-200/35 bg-emerald-300/12 text-emerald-100";
+      ? "text-cyan-100"
+      : "text-emerald-100";
+  const haloClassName =
+    tone === "cyan"
+      ? "fill-cyan-300/12 stroke-cyan-200/45"
+      : "fill-emerald-300/12 stroke-emerald-200/45";
+  const mouthClassName =
+    agent.side === "left"
+      ? "agent-theater-mouth-left-active"
+      : "agent-theater-mouth-right-active";
+  const activeMouthPath =
+    agent.side === "left"
+      ? "M44 52 C58 50 74 54 84 62 C72 69 56 67 44 60 Z"
+      : "M76 52 C62 50 46 54 36 62 C48 69 64 67 76 60 Z";
+  const eyePositions =
+    agent.side === "left"
+      ? [
+          { cx: 53, cy: 38 },
+          { cx: 75, cy: 38 },
+        ]
+      : [
+          { cx: 45, cy: 38 },
+          { cx: 67, cy: 38 },
+        ];
 
   return (
-    <div className="flex min-w-20 flex-col items-center sm:min-w-24">
-      <div
-        className={`agent-theater-bob relative h-40 w-20 sm:w-24 ${active ? "agent-theater-speaking" : ""}`}
+    <div className="flex min-w-24 flex-col items-center">
+      <svg
+        aria-label={`${agent.name} stick figure`}
+        className={`agent-theater-bob h-44 w-28 overflow-visible ${toneClassName} ${
+          active ? "agent-theater-speaking" : ""
+        }`}
+        role="img"
+        viewBox="0 0 120 180"
       >
-        <div
-          className={`absolute left-1/2 top-0 h-16 w-16 -translate-x-1/2 rounded-full border-2 ${toneClassName}`}
-        >
-          <div className="absolute left-4 top-5 h-1.5 w-1.5 rounded-full bg-white" />
-          <div className="absolute right-4 top-5 h-1.5 w-1.5 rounded-full bg-white" />
-          <div
-            className={`agent-theater-mouth absolute left-1/2 top-9 h-1.5 w-6 -translate-x-1/2 rounded-full bg-white/80 ${
-              active ? "agent-theater-mouth-active" : ""
-            }`}
-          />
-        </div>
-        <div className="absolute left-1/2 top-16 h-16 w-0.5 -translate-x-1/2 bg-white/70" />
-        <div className="absolute left-[1.35rem] top-20 h-0.5 w-20 rotate-[-18deg] bg-white/60" />
-        <div className="absolute left-[1.35rem] top-20 h-0.5 w-20 rotate-[18deg] bg-white/60" />
-        <div className="absolute left-[2.15rem] top-[7.2rem] h-0.5 w-12 rotate-[52deg] bg-white/60" />
-        <div className="absolute right-[2.15rem] top-[7.2rem] h-0.5 w-12 rotate-[-52deg] bg-white/60" />
-        <div
-          className={`absolute left-1/2 top-2 h-20 w-20 -translate-x-1/2 rounded-full blur-2xl ${
-            active ? "bg-cyan-300/20" : "bg-white/5"
-          }`}
+        <ellipse
+          className={active ? "fill-cyan-300/12" : "fill-white/5"}
+          cx="60"
+          cy="77"
+          rx="52"
+          ry="70"
         />
-      </div>
+        <g
+          className="agent-theater-stick-bones"
+          fill="none"
+          stroke="rgba(255,255,255,0.7)"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="4"
+        >
+          <path d="M60 67 L60 118" />
+          <path d="M60 84 L26 71" />
+          <path d="M60 84 L94 71" />
+          <path d="M60 118 L34 158" />
+          <path d="M60 118 L86 158" />
+        </g>
+        <circle
+          className={haloClassName}
+          cx="60"
+          cy="39"
+          r="29"
+          strokeWidth="4"
+        />
+        {eyePositions.map((eye) => (
+          <circle
+            cx={eye.cx}
+            cy={eye.cy}
+            fill="rgba(255,255,255,0.92)"
+            key={`${eye.cx}-${eye.cy}`}
+            r="4.8"
+          />
+        ))}
+        {active ? (
+          <path
+            className={`agent-theater-mouth-shape ${mouthClassName}`}
+            d={activeMouthPath}
+            fill="rgba(255,255,255,0.86)"
+          />
+        ) : (
+          <path
+            d="M48 56 L72 56"
+            fill="none"
+            stroke="rgba(255,255,255,0.82)"
+            strokeLinecap="round"
+            strokeWidth="6"
+          />
+        )}
+      </svg>
       <p className="mt-2 max-w-32 truncate rounded-full border border-white/10 bg-slate-950/65 px-4 py-2 text-sm font-bold text-white">
         {agent.name}
       </p>

@@ -38,19 +38,6 @@ body {
   }
 }
 
-@keyframes agent-theater-mouth {
-  0%,
-  100% {
-    height: 0.34rem;
-    transform: translateX(-50%) scaleX(1);
-  }
-
-  50% {
-    height: 0.78rem;
-    transform: translateX(-50%) scaleX(0.72);
-  }
-}
-
 @keyframes agent-theater-stage-glow {
   0%,
   100% {
@@ -62,6 +49,28 @@ body {
   }
 }
 
+@keyframes agent-theater-mouth-left {
+  0%,
+  100% {
+    transform: scaleX(0.78) scaleY(0.68);
+  }
+
+  50% {
+    transform: scaleX(1.08) scaleY(1);
+  }
+}
+
+@keyframes agent-theater-mouth-right {
+  0%,
+  100% {
+    transform: scaleX(0.78) scaleY(0.68);
+  }
+
+  50% {
+    transform: scaleX(1.08) scaleY(1);
+  }
+}
+
 .agent-theater-bob {
   animation: agent-theater-bob 2.5s ease-in-out infinite;
 }
@@ -70,8 +79,22 @@ body {
   animation-duration: 1.25s;
 }
 
-.agent-theater-mouth-active {
-  animation: agent-theater-mouth 0.42s ease-in-out infinite;
+.agent-theater-stick-bones {
+  vector-effect: non-scaling-stroke;
+}
+
+.agent-theater-mouth-shape {
+  transform-box: fill-box;
+}
+
+.agent-theater-mouth-left-active {
+  animation: agent-theater-mouth-left 0.44s ease-in-out infinite;
+  transform-origin: left center;
+}
+
+.agent-theater-mouth-right-active {
+  animation: agent-theater-mouth-right 0.44s ease-in-out infinite;
+  transform-origin: right center;
 }
 
 .agent-theater-stage-light {

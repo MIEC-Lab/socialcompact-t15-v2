@@ -324,14 +324,8 @@ function StickAgent({
     tone === "cyan"
       ? "fill-cyan-300/12 stroke-cyan-200/45"
       : "fill-emerald-300/12 stroke-emerald-200/45";
-  const mouthClassName =
-    agent.side === "left"
-      ? "agent-theater-mouth-left-active"
-      : "agent-theater-mouth-right-active";
   const activeMouthPath =
-    agent.side === "left"
-      ? "M44 52 C58 50 74 54 84 62 C72 69 56 67 44 60 Z"
-      : "M76 52 C62 50 46 54 36 62 C48 69 64 67 76 60 Z";
+    "M44 53 C52 50 68 50 76 53 C81 56 81 64 76 67 C68 70 52 70 44 67 C39 64 39 56 44 53 Z";
   const eyePositions =
     agent.side === "left"
       ? [
@@ -392,7 +386,7 @@ function StickAgent({
         ))}
         {active ? (
           <path
-            className={`agent-theater-mouth-shape ${mouthClassName}`}
+            className="agent-theater-mouth-shape agent-theater-mouth-pulse-active"
             d={activeMouthPath}
             fill="rgba(255,255,255,0.86)"
           />

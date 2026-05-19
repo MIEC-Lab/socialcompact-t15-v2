@@ -49,25 +49,14 @@ body {
   }
 }
 
-@keyframes agent-theater-mouth-left {
+@keyframes agent-theater-mouth-pulse {
   0%,
   100% {
-    transform: scaleX(0.78) scaleY(0.68);
+    transform: scale(0.78, 0.64);
   }
 
   50% {
-    transform: scaleX(1.08) scaleY(1);
-  }
-}
-
-@keyframes agent-theater-mouth-right {
-  0%,
-  100% {
-    transform: scaleX(0.78) scaleY(0.68);
-  }
-
-  50% {
-    transform: scaleX(1.08) scaleY(1);
+    transform: scale(1.06, 1);
   }
 }
 
@@ -87,14 +76,9 @@ body {
   transform-box: fill-box;
 }
 
-.agent-theater-mouth-left-active {
-  animation: agent-theater-mouth-left 0.44s ease-in-out infinite;
-  transform-origin: left center;
-}
-
-.agent-theater-mouth-right-active {
-  animation: agent-theater-mouth-right 0.44s ease-in-out infinite;
-  transform-origin: right center;
+.agent-theater-mouth-pulse-active {
+  animation: agent-theater-mouth-pulse 0.44s ease-in-out infinite;
+  transform-origin: center;
 }
 
 .agent-theater-stage-light {

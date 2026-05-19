@@ -47,9 +47,12 @@ project-video/
     comparison_demo.mp4
   hyperframes/
     index.html
+    styles.css
+    script.js
     package.json
     hyperframes.json
     meta.json
+    final_video.mp4
   assets/
     screenshots/
     diagrams/

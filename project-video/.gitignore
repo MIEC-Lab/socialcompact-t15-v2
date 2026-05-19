@@ -1,0 +1,9 @@
+.venv/
+assets/manim/media/
+hyperframes/bin/
+hyperframes/node_modules/
+hyperframes/renders/
+hyperframes/final_video.mp4
+hyperframes/.hyperframes/
+*.log
+

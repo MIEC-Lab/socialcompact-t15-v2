@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <rect width="1600" height="900" fill="#06111f"/>
+  <defs>
+    <linearGradient id="card" x1="0" x2="1">
+      <stop offset="0" stop-color="#123047"/>
+      <stop offset="1" stop-color="#162033"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6ee7f9"/>
+    </marker>
+  </defs>
+  <text x="80" y="95" fill="#ffffff" font-family="Arial, sans-serif" font-size="54" font-weight="800">SocialCOMPACT V2 Architecture</text>
+  <text x="80" y="145" fill="#a8c7dc" font-family="Arial, sans-serif" font-size="28">Frontend polls structured match events while the backend orchestrates the real Arena run.</text>
+  <g font-family="Arial, sans-serif">
+    <rect x="90" y="270" width="290" height="150" rx="28" fill="url(#card)" stroke="#38bdf8" stroke-width="3"/>
+    <text x="140" y="333" fill="#67e8f9" font-size="28" font-weight="700">Vercel Frontend</text>
+    <text x="140" y="376" fill="#ffffff" font-size="23">Start match</text>
+    <text x="140" y="410" fill="#ffffff" font-size="23">Poll live logs</text>
+    <rect x="500" y="270" width="300" height="150" rx="28" fill="url(#card)" stroke="#22c55e" stroke-width="3"/>
+    <text x="545" y="333" fill="#86efac" font-size="28" font-weight="700">FastAPI Backend</text>
+    <text x="545" y="376" fill="#ffffff" font-size="23">Create match id</text>
+    <text x="545" y="410" fill="#ffffff" font-size="23">Store event logs</text>
+    <rect x="920" y="190" width="280" height="140" rx="28" fill="url(#card)" stroke="#fbbf24" stroke-width="3"/>
+    <text x="985" y="250" fill="#fde68a" font-size="28" font-weight="700">Arena</text>
+    <text x="975" y="293" fill="#ffffff" font-size="23">Game engine</text>
+    <rect x="1260" y="115" width="240" height="120" rx="26" fill="url(#card)" stroke="#a78bfa" stroke-width="3"/>
+    <text x="1310" y="168" fill="#ddd6fe" font-size="27" font-weight="700">Agent 1</text>
+    <text x="1305" y="205" fill="#ffffff" font-size="21">Chat / Act</text>
+    <rect x="1260" y="295" width="240" height="120" rx="26" fill="url(#card)" stroke="#a78bfa" stroke-width="3"/>
+    <text x="1310" y="348" fill="#ddd6fe" font-size="27" font-weight="700">Agent 2</text>
+    <text x="1305" y="385" fill="#ffffff" font-size="21">Predict / Reason</text>
+    <rect x="500" y="590" width="600" height="155" rx="30" fill="#0b1b2f" stroke="#38bdf8" stroke-width="2"/>
+    <text x="555" y="652" fill="#67e8f9" font-size="30" font-weight="700">Live Artifact Stream</text>
+    <text x="555" y="701" fill="#ffffff" font-size="25">chat -> reasoning -> prediction -> decision -> observation -> verdict</text>
+  </g>
+  <g stroke="#6ee7f9" stroke-width="5" fill="none" marker-end="url(#arrow)">
+    <path d="M380 345 C430 345 450 345 500 345"/>
+    <path d="M800 345 C850 330 880 285 920 260"/>
+    <path d="M1200 250 C1230 215 1230 190 1260 175"/>
+    <path d="M1200 270 C1230 315 1230 335 1260 355"/>
+    <path d="M920 305 C850 520 775 560 800 590"/>
+    <path d="M720 590 C560 540 430 455 340 420"/>
+  </g>
+</svg>

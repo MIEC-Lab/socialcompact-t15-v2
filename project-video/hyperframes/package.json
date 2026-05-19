@@ -1,0 +1,18 @@
+{
+  "name": "socialcompact-video",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes hyperframes@0.6.25 preview",
+    "check": "npx --yes hyperframes@0.6.25 lint .",
+    "doctor": "npx --yes hyperframes@0.6.25 doctor",
+    "setup-tools": "node ./scripts/setup-local-tools.mjs",
+    "doctor:local": "npm run setup-tools && set PATH=%CD%\\bin;%PATH%&& npx --yes hyperframes@0.6.25 doctor",
+    "render": "npm run setup-tools && set PATH=%CD%\\bin;%PATH%&& npx --yes hyperframes@0.6.25 render . --output ./final_video.mp4"
+  },
+  "devDependencies": {
+    "ffmpeg-static": "^5.2.0",
+    "ffprobe-static": "^3.1.0",
+    "hyperframes": "0.6.25"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "project": "SocialCOMPACT",
+  "version1": {
+    "label": "V1 MIEC submission",
+    "commit": "f22f70c",
+    "summary": "Working web flow with polling logs, but limited deployed observability."
+  },
+  "version2": {
+    "label": "V2 public live Agent demo",
+    "commit": "ec6d470",
+    "summary": "Public deployment with live Agent mini theater, health checks, and clearer Arena result states."
+  },
+  "comparison": [
+    {
+      "metric": "User feedback while match runs",
+      "v1": "Queued/running state plus logs",
+      "v2": "Live chat, reasoning, prediction, decision, and observation cards"
+    },
+    {
+      "metric": "Deployment readiness",
+      "v1": "Local/backend flow",
+      "v2": "Vercel frontend plus Render backend, Arena, and Agent services"
+    },
+    {
+      "metric": "Cold-start handling",
+      "v1": "More likely to appear stalled",
+      "v2": "Health endpoints, running snapshots, and clearer retry guidance"
+    },
+    {
+      "metric": "Viewer understanding",
+      "v1": "Final result oriented",
+      "v2": "Process oriented and replayable through logs"
+    }
+  ]
+}
+

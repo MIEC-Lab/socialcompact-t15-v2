@@ -6,4 +6,5 @@ hyperframes/renders/
 hyperframes/final_video.mp4
 hyperframes/.hyperframes/
 *.log
-
+assets/metrics/*_check.jpg
+assets/metrics/manim_contact_sheet.jpg

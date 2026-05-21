@@ -14,6 +14,7 @@ type AgentRole = {
   latestReasoning?: GameLogEvent;
   latestPrediction?: GameLogEvent;
   latestDecision?: GameLogEvent;
+  latestSignal?: GameLogEvent;
 };
 
 type AgentTone = "ruby" | "azure";
@@ -268,6 +269,11 @@ function buildAgentRole(
   events: GameLogEvent[]
 ): AgentRole {
   const ownEvents = events.filter((event) => event.actor === name);
+  const latestSignal = [...ownEvents]
+    .reverse()
+    .find((event) =>
+      AGENT_PHASES.includes(event.phase as (typeof AGENT_PHASES)[number])
+    );
 
   return {
     name,
@@ -282,6 +288,7 @@ function buildAgentRole(
     latestDecision: [...ownEvents]
       .reverse()
       .find((event) => event.phase === "decision"),
+    latestSignal,
   };
 }
 
@@ -332,11 +339,15 @@ function SpeechBubble({
   active: boolean;
   compact?: boolean;
 }) {
-  const latestMessage = agent.latestChat?.message;
   const pointerClassName =
     agent.side === "left"
       ? "left-10 border-r-white"
       : "right-10 border-l-white";
+  const visibleEvent = agent.latestSignal;
+  const latestMessage = visibleEvent
+    ? formatBubbleSignal(visibleEvent)
+    : "Listening for the next message...";
+  const phaseLabel = visibleEvent ? formatPhaseLabel(visibleEvent.phase) : "Idle";
 
   return (
     <div
@@ -359,6 +370,13 @@ function SpeechBubble({
         }`}
       >
         {agent.name}
+      </p>
+      <p
+        className={`mt-1 text-[0.62rem] font-semibold uppercase tracking-[0.2em] ${
+          active ? "text-slate-500" : "text-slate-400"
+        }`}
+      >
+        {phaseLabel}
       </p>
       <p
         className={`mt-2 overflow-y-auto whitespace-pre-wrap break-words ${
@@ -395,6 +413,22 @@ function MiniBadge({ label, active }: { label: string; active: boolean }) {
       {label}
     </span>
   );
+}
+
+function formatBubbleSignal(event: GameLogEvent) {
+  if (event.phase === "prediction" || event.phase === "decision") {
+    const parsedAction = parseBubbleAction(event.message);
+
+    if (parsedAction !== null) {
+      return `${formatPhaseLabel(event.phase)}: ${parsedAction.shots} shot${parsedAction.shots === 1 ? "" : "s"} at ${parsedAction.target}.`;
+    }
+  }
+
+  return event.message;
+}
+
+function parseBubbleAction(message: string) {
+  return parseDecisionActions(message)[0] ?? null;
 }
 
 function DoodleDuelist({

@@ -16,7 +16,7 @@ type AgentRole = {
   latestDecision?: GameLogEvent;
 };
 
-type AgentTone = "copper" | "sage";
+type AgentTone = "ruby" | "azure";
 
 type ParsedShotAction = {
   target: string;
@@ -106,6 +106,8 @@ export function AgentMiniTheater({
     latestVolleyCue?.shots.some(
       (shot) => shot.targetSide === "right" && shot.landed
     ) ?? false;
+  const leftPerformerKey = `${leftAgent.name}-${activeName === leftAgent.name ? "speak" : "idle"}-${leftIsFiring ? latestVolleyCue?.id ?? "fire" : "calm"}-${leftUnderFire ? latestVolleyCue?.id ?? "hit" : "steady"}`;
+  const rightPerformerKey = `${rightAgent.name}-${activeName === rightAgent.name ? "speak" : "idle"}-${rightIsFiring ? latestVolleyCue?.id ?? "fire" : "calm"}-${rightUnderFire ? latestVolleyCue?.id ?? "hit" : "steady"}`;
 
   return (
     <section className="relative overflow-hidden rounded-[36px] border border-cyan-300/20 bg-[linear-gradient(145deg,rgba(8,47,73,0.72),rgba(15,23,42,0.95)_42%,rgba(20,83,45,0.38))] p-5 shadow-2xl shadow-cyan-950/30 backdrop-blur sm:p-7">
@@ -146,56 +148,52 @@ export function AgentMiniTheater({
               <div className="absolute inset-x-6 bottom-24 h-px bg-cyan-200/15" />
               <div className="absolute bottom-0 left-0 right-0 h-28 bg-[linear-gradient(180deg,rgba(30,41,59,0.15),rgba(15,23,42,0.92))]" />
 
-              <div className="relative z-10 grid gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(17rem,0.86fr)_minmax(0,0.92fr)] lg:items-stretch">
-              <SpeechBubble
-                agent={leftAgent}
-                active={activeName === leftAgent.name}
-              />
-
-                <div className="relative order-last min-h-72 overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(2,6,23,0.2),rgba(2,6,23,0.62))] px-4 pt-8 lg:order-none">
-                  <div className="absolute inset-x-7 top-6 h-28 rounded-[34px] border border-white/8 bg-[radial-gradient(circle_at_top,rgba(251,191,36,0.22),rgba(8,47,73,0.18)_58%,transparent_76%)]" />
-                  <div className="absolute inset-x-9 bottom-8 h-14 rounded-full border border-amber-100/10 bg-[repeating-linear-gradient(90deg,rgba(148,163,184,0.1)_0,rgba(148,163,184,0.1)_10%,rgba(30,41,59,0.35)_10%,rgba(30,41,59,0.35)_20%)] opacity-70" />
-                  <div className="absolute bottom-0 left-0 right-0 h-24 bg-[linear-gradient(180deg,rgba(8,47,73,0.16),rgba(15,23,42,0.88))]" />
-                  <div className="absolute inset-x-8 bottom-16 h-px bg-white/14" />
-                  <div className="absolute left-1/2 top-5 z-10 w-[15.5rem] max-w-[calc(100%-3rem)] -translate-x-1/2 rounded-[26px] border border-white/10 bg-slate-950/55 px-5 py-3 text-center shadow-lg shadow-cyan-950/20">
-                    <p className="text-[0.68rem] font-semibold uppercase tracking-[0.32em] text-amber-100/85">
-                      Dust Duel Stage
-                    </p>
-                    <p className="mt-1 text-[0.72rem] leading-5 text-slate-400">
-                      Chatter, prediction, and gunfire track the live Arena feed.
-                    </p>
-                  </div>
-                  {latestVolleyCue ? (
-                    <div className="absolute left-1/2 top-[5.8rem] z-10 max-w-[calc(100%-3rem)] -translate-x-1/2 rounded-full border border-amber-200/18 bg-amber-200/10 px-4 py-2 text-center text-[0.64rem] font-semibold uppercase tracking-[0.18em] text-amber-50">
-                      {describeVolleyCue(latestVolleyCue)}
+              <div className="relative z-10">
+                <div className="relative order-last min-h-72 overflow-hidden rounded-[28px] border border-cyan-200/12 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),rgba(15,23,42,0.9)_42%,rgba(2,6,23,0.98))] px-4 pt-4 shadow-inner shadow-slate-950/30 lg:order-none">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_16%,rgba(248,113,113,0.12),transparent_25%),radial-gradient(circle_at_80%_16%,rgba(96,165,250,0.14),transparent_26%),linear-gradient(180deg,rgba(15,23,42,0.04),rgba(2,6,23,0.46))]" />
+                  <div className="absolute inset-x-6 bottom-20 h-px bg-cyan-100/16" />
+                  <div className="absolute bottom-0 left-0 right-0 h-24 bg-[linear-gradient(180deg,rgba(15,23,42,0),rgba(2,6,23,0.78))]" />
+                  <div className="relative h-[28rem]">
+                    <div className="absolute left-4 top-3 z-10 w-[13rem] sm:left-5 sm:w-[14rem]">
+                      <SpeechBubble
+                        agent={leftAgent}
+                        active={activeName === leftAgent.name}
+                        compact
+                      />
                     </div>
-                  ) : null}
-                  <div className="relative flex h-[17.5rem] items-end justify-between gap-3 pt-16">
-                    <CowboyPerformer
-                      agent={leftAgent}
-                      active={activeName === leftAgent.name}
-                      firing={leftIsFiring}
-                      tone="copper"
-                      underFire={leftUnderFire}
-                    />
+                    <div className="absolute right-4 top-3 z-10 w-[13rem] sm:right-5 sm:w-[14rem]">
+                      <SpeechBubble
+                        agent={rightAgent}
+                        active={activeName === rightAgent.name}
+                        compact
+                      />
+                    </div>
                     <ShotAnimationLayer
                       cue={latestVolleyCue}
                       key={latestVolleyCue?.id ?? "no-volley"}
                     />
-                    <CowboyPerformer
-                      agent={rightAgent}
-                      active={activeName === rightAgent.name}
-                      firing={rightIsFiring}
-                      tone="sage"
-                      underFire={rightUnderFire}
-                    />
+                    <div className="absolute bottom-0 left-[11%] flex w-[11rem] justify-center sm:left-[14%]">
+                      <DoodleDuelist
+                        agent={leftAgent}
+                        active={activeName === leftAgent.name}
+                        firing={leftIsFiring}
+                        key={leftPerformerKey}
+                        tone="ruby"
+                        underFire={leftUnderFire}
+                      />
+                    </div>
+                    <div className="absolute bottom-0 right-[11%] flex w-[11rem] justify-center sm:right-[14%]">
+                      <DoodleDuelist
+                        agent={rightAgent}
+                        active={activeName === rightAgent.name}
+                        firing={rightIsFiring}
+                        key={rightPerformerKey}
+                        tone="azure"
+                        underFire={rightUnderFire}
+                      />
+                    </div>
                   </div>
                 </div>
-
-              <SpeechBubble
-                agent={rightAgent}
-                active={activeName === rightAgent.name}
-              />
             </div>
 
             <div className="relative z-10 mt-5 grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.1fr)]">
@@ -325,19 +323,29 @@ function TheaterMetric({ label, value }: { label: string; value: string }) {
   );
 }
 
-function SpeechBubble({ agent, active }: { agent: AgentRole; active: boolean }) {
+function SpeechBubble({
+  agent,
+  active,
+  compact = false,
+}: {
+  agent: AgentRole;
+  active: boolean;
+  compact?: boolean;
+}) {
   const latestMessage = agent.latestChat?.message;
   const pointerClassName =
     agent.side === "left"
-      ? "left-10 border-r-cyan-200/18"
-      : "right-10 border-l-emerald-200/18";
+      ? "left-10 border-r-white"
+      : "right-10 border-l-white";
 
   return (
     <div
-      className={`relative min-h-48 rounded-[28px] border p-4 shadow-[0_18px_70px_rgba(2,6,23,0.32)] transition ${
+      className={`relative rounded-[28px] border-2 shadow-[0_18px_70px_rgba(2,6,23,0.24)] transition ${
+        compact ? "min-h-0 p-3.5" : "min-h-48 p-4"
+      } ${
         active
-          ? "border-cyan-200/35 bg-cyan-200/12"
-          : "border-white/10 bg-slate-950/62"
+          ? "agent-theater-bubble-active border-white/90 bg-white text-slate-900"
+          : "border-white/14 bg-slate-950/62"
       }`}
     >
       <div
@@ -345,18 +353,32 @@ function SpeechBubble({ agent, active }: { agent: AgentRole; active: boolean }) 
           agent.side === "left" ? "border-r-[18px]" : "border-l-[18px]"
         } ${pointerClassName}`}
       />
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
+      <p
+        className={`text-xs font-semibold uppercase tracking-[0.22em] ${
+          active ? "text-slate-700" : "text-cyan-200"
+        }`}
+      >
         {agent.name}
       </p>
-      <p className="mt-2 max-h-28 min-h-16 overflow-y-auto whitespace-pre-wrap break-words text-sm leading-6 text-slate-100">
+      <p
+        className={`mt-2 overflow-y-auto whitespace-pre-wrap break-words ${
+          compact
+            ? "max-h-20 min-h-0 text-[0.92rem] leading-5"
+            : "max-h-28 min-h-16 text-sm leading-6"
+        } ${
+          active ? "text-slate-800" : "text-slate-100"
+        }`}
+      >
         {latestMessage ?? "Listening for the next message..."}
       </p>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <MiniBadge label="Chat" active={Boolean(agent.latestChat)} />
-        <MiniBadge label="Think" active={Boolean(agent.latestReasoning)} />
-        <MiniBadge label="Predict" active={Boolean(agent.latestPrediction)} />
-        <MiniBadge label="Act" active={Boolean(agent.latestDecision)} />
-      </div>
+      {compact ? null : (
+        <div className="mt-3 flex flex-wrap gap-2">
+          <MiniBadge label="Chat" active={Boolean(agent.latestChat)} />
+          <MiniBadge label="Think" active={Boolean(agent.latestReasoning)} />
+          <MiniBadge label="Predict" active={Boolean(agent.latestPrediction)} />
+          <MiniBadge label="Act" active={Boolean(agent.latestDecision)} />
+        </div>
+      )}
     </div>
   );
 }
@@ -375,7 +397,7 @@ function MiniBadge({ label, active }: { label: string; active: boolean }) {
   );
 }
 
-function CowboyPerformer({
+function DoodleDuelist({
   agent,
   active,
   firing,
@@ -388,49 +410,62 @@ function CowboyPerformer({
   tone: AgentTone;
   underFire: boolean;
 }) {
+  const talking = active && !firing;
   const palette =
-    tone === "copper"
+    tone === "ruby"
       ? {
-          accent: "#38bdf8",
-          accentSoft: "#a5f3fc",
-          belt: "#3b2f2f",
-          boots: "#3f2a1d",
-          coatDark: "#3b82f6",
-          coatLight: "#60a5fa",
-          glove: "#f4d0b2",
-          gun: "#a8b3cf",
-          gunDark: "#64748b",
-          hair: "#3f2619",
-          hatBand: "#dbeafe",
-          hatDark: "#6f4327",
-          hatLight: "#b97a52",
-          mouth: "#7c4a2d",
-          pants: "#1e293b",
-          skin: "#f6d1b5",
-          shirt: "#f8fafc",
+          accent: "#ef4444",
+          accentSoft: "#fecaca",
+          armor: "#334155",
+          badge: "#d4a84f",
+          cape: "#991b1b",
+          capeEdge: "#f59e0b",
+          coat: "#8b5a3c",
+          coatSoft: "#f87171",
+          hair: "#4a2f20",
+          pants: "#2f241e",
+          pantsEdge: "#6b4c37",
+          shirt: "#475569",
+          boot: "#1f2937",
+          gun: "#111827",
+          gunMetal: "#475569",
+          hatBand: "#6b4423",
+          hatDark: "#5c3a21",
+          hatLight: "#8a5b35",
+          leather: "#5b3b25",
+          outline: "#111827",
+          scarf: "#b91c1c",
+          skin: "#f6e7d8",
+          stubble: "#5b463a",
         }
       : {
-          accent: "#34d399",
-          accentSoft: "#d1fae5",
-          belt: "#253745",
-          boots: "#2b2f3e",
-          coatDark: "#0f766e",
-          coatLight: "#2dd4bf",
-          glove: "#f4d2b8",
-          gun: "#b7bfd4",
-          gunDark: "#64748b",
-          hair: "#2f2016",
-          hatBand: "#d1fae5",
-          hatDark: "#70482e",
-          hatLight: "#b3835f",
-          mouth: "#7c4d32",
-          pants: "#142334",
-          skin: "#f7d4bd",
-          shirt: "#f8fafc",
+          accent: "#3b82f6",
+          accentSoft: "#bfdbfe",
+          armor: "#334155",
+          badge: "#d4a84f",
+          cape: "#1d4ed8",
+          capeEdge: "#f59e0b",
+          coat: "#8b5a3c",
+          coatSoft: "#60a5fa",
+          hair: "#4a2f20",
+          pants: "#2f241e",
+          pantsEdge: "#6b4c37",
+          shirt: "#475569",
+          boot: "#1f2937",
+          gun: "#111827",
+          gunMetal: "#475569",
+          hatBand: "#6b4423",
+          hatDark: "#5c3a21",
+          hatLight: "#8a5b35",
+          leather: "#5b3b25",
+          outline: "#111827",
+          scarf: "#b91c1c",
+          skin: "#f6e7d8",
+          stubble: "#5b463a",
         };
   const performerId = toDomId(`${agent.name}-${tone}`);
   const performerClassName = [
-    "agent-theater-performer",
+    "agent-theater-doodle",
     active ? "agent-theater-speaking" : "",
     firing ? "agent-theater-firing" : "",
     underFire ? "agent-theater-under-fire" : "",
@@ -438,13 +473,13 @@ function CowboyPerformer({
     .filter(Boolean)
     .join(" ");
   const faceForwardTransform =
-    agent.side === "right" ? "translate(170 0) scale(-1 1)" : undefined;
+    agent.side === "right" ? "translate(184 0) scale(-1 1)" : undefined;
 
   return (
-    <div className="flex min-w-[9rem] flex-col items-center">
+    <div className="flex min-w-0 flex-col items-center">
       <svg
-        aria-label={`${agent.name} cowboy avatar`}
-        className={`h-[13.8rem] w-[10rem] overflow-visible drop-shadow-[0_18px_26px_rgba(15,23,42,0.55)] ${performerClassName}`}
+        aria-label={`${agent.name} doodle duelist`}
+        className={`h-[15rem] w-[11.2rem] overflow-visible ${performerClassName}`}
         role="img"
         style={
           {
@@ -452,19 +487,9 @@ function CowboyPerformer({
             "--kick-direction": agent.side === "left" ? "1" : "-1",
           } as CSSProperties
         }
-        viewBox="0 0 170 240"
+        viewBox="0 0 184 252"
       >
         <defs>
-          <linearGradient
-            id={`coat-${performerId}`}
-            x1="0%"
-            x2="0%"
-            y1="0%"
-            y2="100%"
-          >
-            <stop offset="0%" stopColor={palette.coatLight} />
-            <stop offset="100%" stopColor={palette.coatDark} />
-          </linearGradient>
           <linearGradient
             id={`hat-${performerId}`}
             x1="0%"
@@ -475,184 +500,492 @@ function CowboyPerformer({
             <stop offset="0%" stopColor={palette.hatLight} />
             <stop offset="100%" stopColor={palette.hatDark} />
           </linearGradient>
+          <linearGradient
+            id={`coat-${performerId}`}
+            x1="0%"
+            x2="100%"
+            y1="0%"
+            y2="100%"
+          >
+            <stop offset="0%" stopColor={palette.coatSoft} />
+            <stop offset="100%" stopColor={palette.coat} />
+          </linearGradient>
         </defs>
 
-        <ellipse
-          cx="86"
-          cy="225"
-          fill="rgba(15,23,42,0.55)"
-          rx="44"
-          ry="12"
-        />
+        <ellipse cx="92" cy="230" fill="rgba(15,23,42,0.34)" rx="38" ry="10" />
 
         <g transform={faceForwardTransform}>
-          <path
-            d="M74 156 L68 188 L59 215"
-            fill="none"
-            stroke={palette.pants}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="12"
-          />
-          <path
-            d="M98 156 L102 188 L113 215"
-            fill="none"
-            stroke={palette.pants}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="12"
-          />
-          <path
-            d="M52 214 H74 Q76 214 76 217 V223 H51 V217 Q51 214 52 214 Z"
-            fill={palette.boots}
-          />
-          <path
-            d="M100 214 H121 Q123 214 123 217 V223 H99 V217 Q99 214 100 214 Z"
-            fill={palette.boots}
-          />
-
-          <path
-            d="M67 106 Q49 127 47 159"
-            fill="none"
-            stroke={palette.coatDark}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="12"
-          />
-          <path
-            d="M101 106 Q122 123 136 132"
-            fill="none"
-            stroke={palette.coatDark}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="12"
-          />
-          <circle cx="46" cy="160" fill={palette.glove} r="7.5" />
-          <circle cx="138" cy="133" fill={palette.glove} r="7.5" />
-          <g transform="translate(142 130)">
-            <rect
-              fill={palette.gun}
-              height="8"
-              rx="3"
-              stroke={palette.gunDark}
-              strokeWidth="1.5"
-              width="18"
-              x="0"
-              y="-4"
+          <g className={talking ? "agent-theater-poncho-flutter" : ""}>
+            <path
+              d="M101 90 Q136 97 148 128 Q134 140 114 153 L100 123 Z"
+              fill={palette.cape}
+              stroke={palette.outline}
+              strokeLinejoin="round"
+              strokeWidth="4"
             />
-            <rect
-              fill={palette.gunDark}
-              height="11"
-              rx="2"
-              width="6"
-              x="7"
-              y="2"
+            <path
+              d="M107 96 Q129 103 139 124"
+              fill="none"
+              stroke={palette.capeEdge}
+              strokeLinecap="round"
+              strokeWidth="3"
             />
-            <rect fill={palette.gunDark} height="4" rx="2" width="8" x="16" y="-2" />
+            <path
+              d="M114 112 L130 108"
+              fill="none"
+              stroke={palette.capeEdge}
+              strokeLinecap="round"
+              strokeWidth="3"
+            />
           </g>
 
-          <circle
-            cx="84"
-            cy="65"
-            fill={palette.skin}
-            r="34"
-            stroke="rgba(255,255,255,0.2)"
-            strokeWidth="2"
+          <path
+            d="M72 91 Q91 80 111 91 L114 141 Q92 154 69 141 Z"
+            fill={`url(#coat-${performerId})`}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="4"
           />
           <path
-            d="M55 57 Q69 35 85 35 Q102 35 113 57 L112 47 Q85 26 58 45 Z"
-            fill={palette.hair}
-          />
-          <ellipse cx="84" cy="27" fill={palette.hatDark} rx="45" ry="10" />
-          <path
-            d="M56 26 Q84 7 112 26 L112 51 Q84 44 56 51 Z"
-            fill={`url(#hat-${performerId})`}
-            stroke="rgba(255,255,255,0.16)"
-            strokeWidth="2"
+            d="M77 97 Q92 108 107 97"
+            fill={palette.scarf}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="3"
           />
           <path
-            d="M61 38 H107"
+            d="M80 95 Q91 114 103 95"
+            fill={palette.shirt}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="3"
+          />
+          <rect
+            fill={palette.armor}
+            height="17"
+            rx="6"
+            stroke={palette.outline}
+            strokeWidth="3"
+            width="26"
+            x="79"
+            y="106"
+          />
+          <path
+            d="M92 101 L92 139"
             fill="none"
-            stroke={palette.hatBand}
+            opacity="0.7"
+            stroke={palette.outline}
             strokeLinecap="round"
-            strokeWidth="6"
+            strokeWidth="3"
+          />
+          <rect
+            fill={palette.badge}
+            height="8"
+            rx="2.5"
+            stroke={palette.outline}
+            strokeWidth="2"
+            width="11"
+            x="87"
+            y="110"
+          />
+          <path
+            d="M76 133 H109"
+            fill="none"
+            opacity="0.45"
+            stroke={palette.leather}
+            strokeLinecap="round"
+            strokeWidth="3.2"
+          />
+          <path
+            d="M81 139 Q92 144 103 139"
+            fill={palette.leather}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="3"
           />
 
-          <ellipse cx="74" cy="67" fill="#0f172a" rx="5.2" ry="6.1" />
-          <ellipse cx="95" cy="67" fill="#0f172a" rx="5.2" ry="6.1" />
-          <circle cx="75.5" cy="64.8" fill="rgba(255,255,255,0.92)" r="1.5" />
-          <circle cx="96.5" cy="64.8" fill="rgba(255,255,255,0.92)" r="1.5" />
+          {firing ? (
+            <>
+              <path
+                d="M69 103 Q61 119 66 144 L77 144 Q79 124 83 108 Z"
+                fill={palette.coatSoft}
+                stroke={palette.outline}
+                strokeLinejoin="round"
+                strokeWidth="3.4"
+              />
+              <path
+                d="M64 143 Q68 147 74 147 L73 155 Q66 156 61 150 Z"
+                fill={palette.skin}
+                stroke={palette.outline}
+                strokeLinejoin="round"
+                strokeWidth="2.6"
+              />
+              <path
+                d="M101 102 Q119 104 132 98 L136 110 Q122 121 102 118 Z"
+                fill={palette.coatSoft}
+                stroke={palette.outline}
+                strokeLinejoin="round"
+                strokeWidth="3.4"
+              />
+              <path
+                d="M131 98 Q145 95 157 97 L157 108 Q145 111 132 110 Z"
+                fill={palette.skin}
+                stroke={palette.outline}
+                strokeLinejoin="round"
+                strokeWidth="2.6"
+              />
+            </>
+          ) : talking ? (
+            <>
+              <path
+                d="M70 103 Q64 116 70 133 L81 132 Q81 120 83 107 Z"
+                fill={palette.coatSoft}
+                stroke={palette.outline}
+                strokeLinejoin="round"
+                strokeWidth="3.4"
+              />
+              <path
+                d="M70 133 Q74 136 80 136 L80 143 Q74 147 68 145 Z"
+                fill={palette.skin}
+                stroke={palette.outline}
+                strokeLinejoin="round"
+                strokeWidth="2.6"
+              />
+              <g className="agent-theater-talk-hand">
+                <path
+                  d="M101 102 Q113 108 122 99 L128 108 Q121 118 106 120 Z"
+                  fill={palette.coatSoft}
+                  stroke={palette.outline}
+                  strokeLinejoin="round"
+                  strokeWidth="3.4"
+                />
+                <path
+                  d="M127 96 Q132 92 138 93 Q141 97 140 102 Q135 106 129 105 Q126 101 127 96 Z"
+                  fill={palette.skin}
+                  stroke={palette.outline}
+                  strokeLinejoin="round"
+                  strokeWidth="2.6"
+                />
+              </g>
+            </>
+          ) : (
+            <>
+              <path
+                d="M69 103 Q61 118 66 142 L77 142 Q79 123 83 107 Z"
+                fill={palette.coatSoft}
+                stroke={palette.outline}
+                strokeLinejoin="round"
+                strokeWidth="3.4"
+              />
+              <path
+                d="M65 141 Q69 144 75 144 L75 151 Q69 154 63 150 Z"
+                fill={palette.skin}
+                stroke={palette.outline}
+                strokeLinejoin="round"
+                strokeWidth="2.6"
+              />
+              <path
+                d="M102 103 Q112 118 112 142 L102 142 Q100 123 97 107 Z"
+                fill={palette.coatSoft}
+                stroke={palette.outline}
+                strokeLinejoin="round"
+                strokeWidth="3.4"
+              />
+              <path
+                d="M103 142 Q107 144 113 144 L113 151 Q108 154 102 151 Z"
+                fill={palette.skin}
+                stroke={palette.outline}
+                strokeLinejoin="round"
+                strokeWidth="2.6"
+              />
+            </>
+          )}
+
           <path
-            d="M81 75 Q84 77 87 75"
+            d="M77 145 Q83 157 83 175 L72 176 Q70 161 72 147 Z"
+            fill={palette.pants}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="3.4"
+          />
+          <path
+            d="M96 145 Q106 157 109 175 L98 176 Q94 160 90 147 Z"
+            fill={palette.pants}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="3.4"
+          />
+          <path
+            d="M73 173 Q75 191 73 213 L84 213 Q86 194 84 175 Z"
+            fill={palette.pantsEdge}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="3.2"
+          />
+          <path
+            d="M98 173 Q102 191 106 213 L117 213 Q114 194 109 175 Z"
+            fill={palette.pantsEdge}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="3.2"
+          />
+          <path
+            d="M68 212 Q77 210 86 213 L87 221 Q77 224 64 222 Z"
+            fill={palette.boot}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="3"
+          />
+          <path
+            d="M101 212 Q112 210 121 214 L121 222 Q111 224 98 222 Z"
+            fill={palette.boot}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="3"
+          />
+
+          <path
+            d="M55 47 Q92 27 130 47 Q92 58 55 47 Z"
+            fill={`url(#hat-${performerId})`}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="4"
+          />
+          <path
+            d="M68 17 Q89 5 112 12 Q124 19 124 35 L124 49 H67 Z"
+            fill={`url(#hat-${performerId})`}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="4"
+          />
+          <path
+            d="M67 49 H123"
             fill="none"
-            stroke="rgba(124,74,45,0.6)"
+            opacity="0.35"
+            stroke="#f8fafc"
+            strokeLinecap="round"
+            strokeWidth="2.2"
+          />
+          <rect
+            fill={palette.hatBand}
+            height="9"
+            rx="3.5"
+            stroke={palette.outline}
+            strokeWidth="2.4"
+            width="54"
+            x="68"
+            y="38"
+          />
+          <path
+            d="M88 36 L92 47 M100 36 L105 47 M112 36 L117 47"
+            fill="none"
+            opacity="0.75"
+            stroke={palette.badge}
             strokeLinecap="round"
             strokeWidth="2.4"
           />
+          <path
+            d="M94 22 L101 25 L103 32 L97 37 L90 34 L88 27 Z"
+            fill={palette.badge}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="2.3"
+          />
 
-          {active ? (
+          <path
+            d="M69 49 Q63 66 68 80 Q89 93 114 82 Q120 64 112 49 Z"
+            fill={palette.skin}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="4.6"
+          />
+          <path
+            d="M71 51 Q89 58 112 50 Q106 82 92 85 Q77 82 71 51 Z"
+            fill={palette.skin}
+            opacity="0.5"
+          />
+          <path
+            d="M72 46 Q79 37 92 36 Q104 34 115 39 Q106 56 92 61 Q79 60 72 46 Z"
+            fill={palette.hair}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="3.4"
+          />
+          <path
+            d="M73 46 Q67 55 69 66 Q79 61 83 49"
+            fill={palette.hair}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="3.2"
+          />
+          <path
+            d="M107 45 Q115 53 117 62 Q108 59 102 49"
+            fill={palette.hair}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="3.2"
+          />
+          <path
+            d="M81 47 Q90 42 99 43 Q91 52 80 53"
+            fill={palette.hair}
+            stroke={palette.outline}
+            strokeLinejoin="round"
+            strokeWidth="2.8"
+          />
+
+          <path
+            d={
+              firing
+                ? "M77 61 Q82 52 89 58"
+                : talking
+                  ? "M76 57 Q81 53 87 57"
+                  : "M77 58 Q82 55 88 58"
+            }
+            fill="none"
+            stroke={palette.outline}
+            strokeLinecap="round"
+            strokeWidth="3.1"
+          />
+          <path
+            d={
+              firing
+                ? "M98 58 Q104 50 110 54"
+                : talking
+                  ? "M98 57 Q103 53 109 56"
+                  : "M98 58 Q104 55 110 57"
+            }
+            fill="none"
+            stroke={palette.outline}
+            strokeLinecap="round"
+            strokeWidth="3.1"
+          />
+          {firing ? (
+            <>
+              <path
+                d="M79 67 Q83 66 87 68"
+                fill="none"
+                stroke={palette.outline}
+                strokeLinecap="round"
+                strokeWidth="2.8"
+              />
+              <path
+                d="M98 68 Q104 63 109 65"
+                fill="none"
+                stroke={palette.outline}
+                strokeLinecap="round"
+                strokeWidth="2.8"
+              />
+            </>
+          ) : (
+            <>
+              <ellipse cx="81.5" cy="66" fill={palette.outline} rx="3.8" ry="4.5" />
+              <ellipse cx="103" cy="66" fill={palette.outline} rx="3.8" ry="4.5" />
+            </>
+          )}
+          <path
+            d="M89 66 Q92 69 95 66"
+            fill="none"
+            stroke={palette.stubble}
+            strokeLinecap="round"
+            strokeWidth="2"
+          />
+          <path
+            d="M80 79 Q92 85 105 79"
+            fill="none"
+            opacity="0.7"
+            stroke={palette.stubble}
+            strokeLinecap="round"
+            strokeWidth="5"
+          />
+          <path
+            d="M91 78 L95 88"
+            fill="none"
+            opacity="0.7"
+            stroke={palette.stubble}
+            strokeLinecap="round"
+            strokeWidth="4.4"
+          />
+          <path
+            d="M85 86 Q92 91 99 86"
+            fill="none"
+            opacity="0.72"
+            stroke={palette.stubble}
+            strokeLinecap="round"
+            strokeWidth="4.2"
+          />
+
+          {talking ? (
             <ellipse
               className="agent-theater-mouth-shape agent-theater-mouth-pulse-active"
-              cx="84"
-              cy="82"
-              fill={palette.mouth}
-              rx="8.5"
-              ry="5.2"
+              cx="92"
+              cy="75"
+              fill={palette.outline}
+              rx="6.2"
+              ry="5.6"
+            />
+          ) : firing ? (
+            <path
+              d="M83 77 Q92 72 101 76"
+              fill="none"
+              stroke={palette.outline}
+              strokeLinecap="round"
+              strokeWidth="3.8"
             />
           ) : (
-            <rect
-              fill={palette.mouth}
-              height="5.5"
-              rx="2.75"
-              width="18"
-              x="75"
-              y="79"
+            <path
+              d="M84 76 Q93 81 101 75"
+              fill="none"
+              stroke={palette.outline}
+              strokeLinecap="round"
+              strokeWidth="3.2"
             />
           )}
+          <circle cx="75" cy="71" fill={palette.accentSoft} opacity="0.46" r="2.7" />
+          <circle cx="110" cy="71" fill={palette.accentSoft} opacity="0.46" r="2.7" />
 
-          <rect
-            fill={`url(#coat-${performerId})`}
-            height="58"
-            rx="18"
-            stroke="rgba(255,255,255,0.12)"
-            strokeWidth="2"
-            width="46"
-            x="61"
-            y="96"
-          />
-          <path d="M67 104 L84 135 L101 104" fill={palette.shirt} opacity="0.94" />
-          <path
-            d="M64 95 Q84 118 104 95"
-            fill={palette.accent}
-            opacity="0.98"
-          />
-          <path
-            d="M64 118 Q84 109 104 118"
-            fill="none"
-            stroke="rgba(15,23,42,0.28)"
-            strokeLinecap="round"
-            strokeWidth="2"
-          />
-          <rect x="60" y="149" width="48" height="12" rx="6" fill={palette.belt} />
-          <rect
-            x="80.5"
-            y="147"
-            width="9"
-            height="16"
-            rx="3"
-            fill={palette.accentSoft}
-            opacity="0.9"
-          />
-          <path
-            d="M103 154 L115 176"
-            fill="none"
-            stroke={palette.belt}
-            strokeLinecap="round"
-            strokeWidth="8"
-          />
+          {firing ? (
+            <g
+              className="agent-theater-pistol-slide"
+              transform="translate(145 95)"
+            >
+              <rect
+                fill={palette.gun}
+                height="8"
+                rx="2"
+                stroke={palette.outline}
+                strokeWidth="2"
+                width="31"
+                x="0"
+                y="-5"
+              />
+              <rect
+                fill={palette.gunMetal}
+                height="4.5"
+                rx="1.5"
+                width="11"
+                x="19"
+                y="-3.5"
+              />
+              <path
+                d="M12 4 H20 L17 19 L8 16 Z"
+                fill={palette.gun}
+                stroke={palette.outline}
+                strokeLinejoin="round"
+                strokeWidth="2"
+              />
+              <path
+                d="M13 5 Q10 8 9 12"
+                fill="none"
+                stroke={palette.outline}
+                strokeLinecap="round"
+                strokeWidth="2"
+              />
+              <circle cx="30" cy="-1.2" fill="#cbd5e1" r="1.4" />
+            </g>
+          ) : null}
         </g>
       </svg>
-      <p className="mt-3 max-w-36 truncate rounded-full border border-white/10 bg-slate-950/65 px-4 py-2 text-sm font-bold text-white">
+      <p className="mt-3 max-w-36 truncate rounded-full border border-white/12 bg-slate-950/72 px-4 py-2 text-sm font-bold text-white shadow-[0_14px_30px_rgba(2,6,23,0.26)]">
         {agent.name}
       </p>
     </div>
@@ -687,7 +1020,7 @@ function ShotAnimation({
   index: number;
   total: number;
 }) {
-  const shotY = 117 + (index - (total - 1) / 2) * 13;
+  const shotY = 266 + (index - (total - 1) / 2) * 13;
   const volleyScale = Math.min(1.35, 0.94 + cue.shots * 0.08);
 
   return (
@@ -832,23 +1165,6 @@ function TimelineEvent({ event }: { event: GameLogEvent }) {
       </p>
     </article>
   );
-}
-
-function describeVolleyCue(cue: StageVolleyCue) {
-  if (cue.shots.length === 1) {
-    const shot = cue.shots[0];
-    const shotLabel = shot.shots > 1 ? `${shot.shots} shots` : "1 shot";
-
-    return `${shot.actor} fires ${shotLabel} at ${shot.target}`;
-  }
-
-  const actors = Array.from(new Set(cue.shots.map((shot) => shot.actor)));
-
-  if (actors.length > 1) {
-    return `Crossfire in round ${cue.round}`;
-  }
-
-  return `${actors[0] ?? "An Agent"} opens a volley`;
 }
 
 function findLatestVolleyCue(

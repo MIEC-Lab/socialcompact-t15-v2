@@ -129,11 +129,15 @@ body {
 @keyframes agent-theater-poncho-flutter {
   0%,
   100% {
-    transform: rotate(0deg) translateX(0);
+    transform: rotate(0deg) translateX(0) translateY(0);
   }
 
-  50% {
-    transform: rotate(-4deg) translateX(1px);
+  40% {
+    transform: rotate(-1.8deg) translateX(1px) translateY(0.4px);
+  }
+
+  72% {
+    transform: rotate(2.4deg) translateX(2px) translateY(-0.8px);
   }
 }
 
@@ -263,9 +267,9 @@ body {
 }
 
 .agent-theater-poncho-flutter {
-  animation: agent-theater-poncho-flutter 1.15s ease-in-out infinite;
+  animation: agent-theater-poncho-flutter 1.35s ease-in-out infinite;
   transform-box: fill-box;
-  transform-origin: left top;
+  transform-origin: 18% 18%;
 }
 
 .agent-theater-stage-light {

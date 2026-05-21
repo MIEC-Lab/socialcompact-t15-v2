@@ -43,6 +43,13 @@ type StageVolleyCue = {
 };
 
 const AGENT_PHASES = ["chat", "reasoning", "prediction", "decision"] as const;
+const THEATER_PHASES = [
+  "chat",
+  "reasoning",
+  "prediction",
+  "decision",
+  "observation",
+] as const;
 const ATTACK_EVENT_PATTERN = /^(.*?) attacks (.*?) for (\d+) damage\.$/;
 const HIT_EVENT_PATTERN = /^(.*?) hit (.*?)!$/;
 const MISSED_EVENT_PATTERN = /^(.*?) attacked (.*?) but missed!\.$/;
@@ -59,7 +66,20 @@ export function AgentMiniTheater({
   const leftAgent = buildAgentRole(leftName, "left", processEvents);
   const rightAgent = buildAgentRole(rightName, "right", processEvents);
   const latestAgentEvent = agentEvents[agentEvents.length - 1];
-  const activeName = latestAgentEvent?.actor ?? "";
+  const latestVisualEvent = processEvents[processEvents.length - 1];
+  const latestStageEvent = [...processEvents]
+    .reverse()
+    .find((event) =>
+      THEATER_PHASES.includes(event.phase as (typeof THEATER_PHASES)[number])
+    );
+  const activeName =
+    latestVisualEvent &&
+    latestVisualEvent.phase !== "observation" &&
+    THEATER_PHASES.includes(
+      latestVisualEvent.phase as (typeof THEATER_PHASES)[number]
+    )
+      ? latestVisualEvent.actor ?? ""
+      : "";
   const featuredReasoning =
     [...processEvents]
       .reverse()
@@ -79,36 +99,43 @@ export function AgentMiniTheater({
     .reverse()
     .find((event) => event.phase === "observation");
   const stageStatus =
-    latestAgentEvent !== undefined
-      ? `${formatPhaseLabel(latestAgentEvent.phase)} from ${latestAgentEvent.actor ?? "Agent"}`
+    latestStageEvent !== undefined
+      ? `${formatPhaseLabel(latestStageEvent.phase)} from ${latestStageEvent.actor ?? "Arena"}`
       : latestSystemEvent?.message ?? result.summary;
   const recentTheaterEvents = processEvents
     .filter((event) =>
-      ["chat", "reasoning", "prediction", "decision", "observation"].includes(
-        event.phase
+      THEATER_PHASES.includes(
+        event.phase as (typeof THEATER_PHASES)[number]
       )
     )
     .slice(-8);
-  const latestVolleyCue = findLatestVolleyCue(
-    processEvents,
-    leftAgent.name,
-    rightAgent.name
-  );
+  const latestDecisionCue =
+    latestVisualEvent?.phase === "decision"
+      ? getStageVolleyCue(latestVisualEvent, leftAgent.name, rightAgent.name)
+      : null;
+  const latestImpactCue =
+    latestVisualEvent?.phase === "observation"
+      ? getStageVolleyCue(latestVisualEvent, leftAgent.name, rightAgent.name)
+      : null;
 
   const leftIsFiring =
-    latestVolleyCue?.shots.some((shot) => shot.side === "left") ?? false;
+    latestDecisionCue?.phase === "decision"
+      ? latestDecisionCue.shots.some((shot) => shot.side === "left")
+      : false;
   const rightIsFiring =
-    latestVolleyCue?.shots.some((shot) => shot.side === "right") ?? false;
+    latestDecisionCue?.phase === "decision"
+      ? latestDecisionCue.shots.some((shot) => shot.side === "right")
+      : false;
   const leftUnderFire =
-    latestVolleyCue?.shots.some(
+    latestImpactCue?.shots.some(
       (shot) => shot.targetSide === "left" && shot.landed
     ) ?? false;
   const rightUnderFire =
-    latestVolleyCue?.shots.some(
+    latestImpactCue?.shots.some(
       (shot) => shot.targetSide === "right" && shot.landed
     ) ?? false;
-  const leftPerformerKey = `${leftAgent.name}-${activeName === leftAgent.name ? "speak" : "idle"}-${leftIsFiring ? latestVolleyCue?.id ?? "fire" : "calm"}-${leftUnderFire ? latestVolleyCue?.id ?? "hit" : "steady"}`;
-  const rightPerformerKey = `${rightAgent.name}-${activeName === rightAgent.name ? "speak" : "idle"}-${rightIsFiring ? latestVolleyCue?.id ?? "fire" : "calm"}-${rightUnderFire ? latestVolleyCue?.id ?? "hit" : "steady"}`;
+  const leftPerformerKey = `${leftAgent.name}-${activeName === leftAgent.name ? "speak" : "idle"}-${leftIsFiring ? latestDecisionCue?.id ?? "fire" : "calm"}-${leftUnderFire ? latestImpactCue?.id ?? "hit" : "steady"}`;
+  const rightPerformerKey = `${rightAgent.name}-${activeName === rightAgent.name ? "speak" : "idle"}-${rightIsFiring ? latestDecisionCue?.id ?? "fire" : "calm"}-${rightUnderFire ? latestImpactCue?.id ?? "hit" : "steady"}`;
 
   return (
     <section className="relative overflow-hidden rounded-[36px] border border-cyan-300/20 bg-[linear-gradient(145deg,rgba(8,47,73,0.72),rgba(15,23,42,0.95)_42%,rgba(20,83,45,0.38))] p-5 shadow-2xl shadow-cyan-950/30 backdrop-blur sm:p-7">
@@ -170,8 +197,14 @@ export function AgentMiniTheater({
                       />
                     </div>
                     <ShotAnimationLayer
-                      cue={latestVolleyCue}
-                      key={latestVolleyCue?.id ?? "no-volley"}
+                      cue={latestDecisionCue}
+                      key={`decision-${latestDecisionCue?.id ?? "no-volley"}`}
+                      mode="volley"
+                    />
+                    <ShotAnimationLayer
+                      cue={latestImpactCue}
+                      key={`impact-${latestImpactCue?.id ?? "no-impact"}`}
+                      mode="impact"
                     />
                     <div className="absolute bottom-0 left-[11%] flex w-[11rem] justify-center sm:left-[14%]">
                       <DoodleDuelist
@@ -445,8 +478,9 @@ function DoodleDuelist({
   underFire: boolean;
 }) {
   const talking = active && !firing;
+  const isRuby = tone === "ruby";
   const palette =
-    tone === "ruby"
+    isRuby
       ? {
           accent: "#ef4444",
           accentSoft: "#fecaca",
@@ -508,6 +542,46 @@ function DoodleDuelist({
     .join(" ");
   const faceForwardTransform =
     agent.side === "right" ? "translate(184 0) scale(-1 1)" : undefined;
+  const hairCrownShape = isRuby
+    ? "M72 46 Q79 37 92 36 Q104 34 115 39 Q106 56 92 61 Q79 60 72 46 Z"
+    : "M71 46 Q80 35 94 35 Q106 35 116 42 Q108 56 93 61 Q80 60 71 46 Z";
+  const sideHairShape = isRuby
+    ? "M73 46 Q67 55 69 66 Q79 61 83 49"
+    : "M72 47 Q66 57 70 68 Q79 62 84 50";
+  const templeHairShape = isRuby
+    ? "M107 45 Q115 53 117 62 Q108 59 102 49"
+    : "M105 45 Q115 51 118 60 Q108 60 101 49";
+  const fringeShape = isRuby
+    ? "M81 47 Q90 42 99 43 Q91 52 80 53"
+    : "M80 46 Q89 40 101 42 Q96 50 81 54";
+  const leftBrowShape = firing
+    ? isRuby
+      ? "M77 61 Q83 50 90 57"
+      : "M78 60 Q84 53 90 56"
+    : talking
+      ? isRuby
+        ? "M76 57 Q81 53 87 57"
+        : "M77 58 Q82 53 88 56"
+      : isRuby
+        ? "M77 58 Q82 55 88 58"
+        : "M78 58 Q83 55 89 57";
+  const rightBrowShape = firing
+    ? isRuby
+      ? "M98 58 Q104 50 110 54"
+      : "M98 59 Q104 52 111 54"
+    : talking
+      ? isRuby
+        ? "M98 57 Q103 53 109 56"
+        : "M98 58 Q103 54 110 55"
+      : isRuby
+        ? "M98 58 Q104 55 110 57"
+        : "M98 58 Q103 56 110 56";
+  const moustacheShape = isRuby
+    ? "M79 79 Q92 86 106 79"
+    : "M82 78 Q92 83 102 79";
+  const chinStubbleShape = isRuby
+    ? "M84 86 Q92 92 101 86"
+    : "M86 85 Q92 89 98 85";
 
   return (
     <div className="flex min-w-0 flex-col items-center">
@@ -551,25 +625,38 @@ function DoodleDuelist({
         <g transform={faceForwardTransform}>
           <g className={talking ? "agent-theater-poncho-flutter" : ""}>
             <path
-              d="M101 90 Q136 97 148 128 Q134 140 114 153 L100 123 Z"
+              d="M100 92 Q128 92 145 108 Q151 118 149 132 Q146 149 128 162 L103 154 L99 121 Z"
               fill={palette.cape}
               stroke={palette.outline}
               strokeLinejoin="round"
               strokeWidth="4"
             />
             <path
-              d="M107 96 Q129 103 139 124"
+              d="M100 95 Q121 95 135 108 Q139 120 136 133 Q126 147 108 148 L101 122 Z"
+              fill={palette.accentSoft}
+              opacity="0.15"
+            />
+            <path
+              d="M108 100 Q124 106 135 119"
               fill="none"
               stroke={palette.capeEdge}
               strokeLinecap="round"
               strokeWidth="3"
             />
             <path
-              d="M114 112 L130 108"
+              d="M112 116 Q122 122 131 120"
               fill="none"
               stroke={palette.capeEdge}
               strokeLinecap="round"
               strokeWidth="3"
+            />
+            <circle
+              cx="101"
+              cy="98"
+              fill={palette.badge}
+              r="4"
+              stroke={palette.outline}
+              strokeWidth="2"
             />
           </g>
 
@@ -839,28 +926,28 @@ function DoodleDuelist({
             opacity="0.5"
           />
           <path
-            d="M72 46 Q79 37 92 36 Q104 34 115 39 Q106 56 92 61 Q79 60 72 46 Z"
+            d={hairCrownShape}
             fill={palette.hair}
             stroke={palette.outline}
             strokeLinejoin="round"
             strokeWidth="3.4"
           />
           <path
-            d="M73 46 Q67 55 69 66 Q79 61 83 49"
+            d={sideHairShape}
             fill={palette.hair}
             stroke={palette.outline}
             strokeLinejoin="round"
             strokeWidth="3.2"
           />
           <path
-            d="M107 45 Q115 53 117 62 Q108 59 102 49"
+            d={templeHairShape}
             fill={palette.hair}
             stroke={palette.outline}
             strokeLinejoin="round"
             strokeWidth="3.2"
           />
           <path
-            d="M81 47 Q90 42 99 43 Q91 52 80 53"
+            d={fringeShape}
             fill={palette.hair}
             stroke={palette.outline}
             strokeLinejoin="round"
@@ -868,26 +955,14 @@ function DoodleDuelist({
           />
 
           <path
-            d={
-              firing
-                ? "M77 61 Q82 52 89 58"
-                : talking
-                  ? "M76 57 Q81 53 87 57"
-                  : "M77 58 Q82 55 88 58"
-            }
+            d={leftBrowShape}
             fill="none"
             stroke={palette.outline}
             strokeLinecap="round"
             strokeWidth="3.1"
           />
           <path
-            d={
-              firing
-                ? "M98 58 Q104 50 110 54"
-                : talking
-                  ? "M98 57 Q103 53 109 56"
-                  : "M98 58 Q104 55 110 57"
-            }
+            d={rightBrowShape}
             fill="none"
             stroke={palette.outline}
             strokeLinecap="round"
@@ -924,29 +999,39 @@ function DoodleDuelist({
             strokeWidth="2"
           />
           <path
-            d="M80 79 Q92 85 105 79"
+            d={moustacheShape}
             fill="none"
             opacity="0.7"
             stroke={palette.stubble}
             strokeLinecap="round"
-            strokeWidth="5"
+            strokeWidth={isRuby ? "5.4" : "4.3"}
           />
           <path
-            d="M91 78 L95 88"
+            d={isRuby ? "M91 77 L95 89" : "M92 78 L95 86"}
             fill="none"
             opacity="0.7"
             stroke={palette.stubble}
             strokeLinecap="round"
-            strokeWidth="4.4"
+            strokeWidth={isRuby ? "4.6" : "3.8"}
           />
           <path
-            d="M85 86 Q92 91 99 86"
+            d={chinStubbleShape}
             fill="none"
             opacity="0.72"
             stroke={palette.stubble}
             strokeLinecap="round"
-            strokeWidth="4.2"
+            strokeWidth={isRuby ? "4.4" : "3.6"}
           />
+          {isRuby ? null : (
+            <path
+              d="M107 70 L111 75"
+              fill="none"
+              opacity="0.62"
+              stroke={palette.stubble}
+              strokeLinecap="round"
+              strokeWidth="2.2"
+            />
+          )}
 
           {talking ? (
             <ellipse
@@ -974,8 +1059,20 @@ function DoodleDuelist({
               strokeWidth="3.2"
             />
           )}
-          <circle cx="75" cy="71" fill={palette.accentSoft} opacity="0.46" r="2.7" />
-          <circle cx="110" cy="71" fill={palette.accentSoft} opacity="0.46" r="2.7" />
+          <circle
+            cx={isRuby ? "75" : "76"}
+            cy={isRuby ? "71" : "72"}
+            fill={palette.accentSoft}
+            opacity={isRuby ? "0.42" : "0.32"}
+            r={isRuby ? "2.7" : "2.2"}
+          />
+          <circle
+            cx={isRuby ? "110" : "108.5"}
+            cy={isRuby ? "71" : "72"}
+            fill={palette.accentSoft}
+            opacity={isRuby ? "0.42" : "0.28"}
+            r={isRuby ? "2.7" : "2"}
+          />
 
           {firing ? (
             <g
@@ -1026,7 +1123,13 @@ function DoodleDuelist({
   );
 }
 
-function ShotAnimationLayer({ cue }: { cue: StageVolleyCue | null }) {
+function ShotAnimationLayer({
+  cue,
+  mode,
+}: {
+  cue: StageVolleyCue | null;
+  mode: "volley" | "impact";
+}) {
   if (!cue) {
     return null;
   }
@@ -1038,6 +1141,7 @@ function ShotAnimationLayer({ cue }: { cue: StageVolleyCue | null }) {
           cue={shot}
           index={index}
           key={`${cue.id}-${shot.actor}-${shot.target}-${index}`}
+          mode={mode}
           total={cue.shots.length}
         />
       ))}
@@ -1048,10 +1152,12 @@ function ShotAnimationLayer({ cue }: { cue: StageVolleyCue | null }) {
 function ShotAnimation({
   cue,
   index,
+  mode,
   total,
 }: {
   cue: ShotCue;
   index: number;
+  mode: "volley" | "impact";
   total: number;
 }) {
   const shotY = 266 + (index - (total - 1) / 2) * 13;
@@ -1067,31 +1173,36 @@ function ShotAnimation({
         } as CSSProperties
       }
     >
-      <div
-        className={`agent-theater-muzzle-flash ${
-          cue.side === "left"
-            ? "agent-theater-muzzle-left"
-            : "agent-theater-muzzle-right"
-        }`}
-      />
-      <div
-        className={`agent-theater-shot-trail ${
-          cue.side === "left"
-            ? "agent-theater-shot-trail-right"
-            : "agent-theater-shot-trail-left"
-        }`}
-      />
-      <div
-        className={`agent-theater-impact-burst ${
-          cue.targetSide === "left"
-            ? "agent-theater-impact-left"
-            : "agent-theater-impact-right"
-        } ${
-          cue.landed
-            ? "agent-theater-impact-hit"
-            : "agent-theater-impact-miss"
-        }`}
-      />
+      {mode === "volley" ? (
+        <>
+          <div
+            className={`agent-theater-muzzle-flash ${
+              cue.side === "left"
+                ? "agent-theater-muzzle-left"
+                : "agent-theater-muzzle-right"
+            }`}
+          />
+          <div
+            className={`agent-theater-shot-trail ${
+              cue.side === "left"
+                ? "agent-theater-shot-trail-right"
+                : "agent-theater-shot-trail-left"
+            }`}
+          />
+        </>
+      ) : (
+        <div
+          className={`agent-theater-impact-burst ${
+            cue.targetSide === "left"
+              ? "agent-theater-impact-left"
+              : "agent-theater-impact-right"
+          } ${
+            cue.landed
+              ? "agent-theater-impact-hit"
+              : "agent-theater-impact-miss"
+          }`}
+        />
+      )}
     </div>
   );
 }
@@ -1201,28 +1312,28 @@ function TimelineEvent({ event }: { event: GameLogEvent }) {
   );
 }
 
-function findLatestVolleyCue(
-  events: GameLogEvent[],
+function getStageVolleyCue(
+  event: GameLogEvent | undefined,
   leftName: string,
   rightName: string
 ) {
-  const reversedEvents = [...events].reverse();
-
-  for (const event of reversedEvents) {
-    const shots = getShotCuesFromEvent(event, leftName, rightName);
-
-    if (shots.length > 0) {
-      return {
-        id: event.id,
-        message: event.message,
-        phase: event.phase,
-        round: event.round,
-        shots,
-      } satisfies StageVolleyCue;
-    }
+  if (!event) {
+    return null;
   }
 
-  return null;
+  const shots = getShotCuesFromEvent(event, leftName, rightName);
+
+  if (shots.length === 0) {
+    return null;
+  }
+
+  return {
+    id: event.id,
+    message: event.message,
+    phase: event.phase,
+    round: event.round,
+    shots,
+  } satisfies StageVolleyCue;
 }
 
 function getShotCuesFromEvent(

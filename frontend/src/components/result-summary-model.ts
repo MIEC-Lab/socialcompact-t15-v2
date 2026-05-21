@@ -3,7 +3,8 @@ import type { MatchResult } from "@/lib/types";
 const ATTACK_EVENT_PATTERN = /^(.*?) attacks (.*?) for (\d+) damage\.$/;
 const HIT_EVENT_PATTERN = /^(.*?) hit (.*?)!$/;
 const LOST_LIVES_EVENT_PATTERN = /^You lost (\d+) lives\.$/;
-const ELIMINATION_EVENT_PATTERN = /^(.*?) is eliminated\.$/;
+const ELIMINATION_EVENT_PATTERN =
+  /^(.*?) (?:is eliminated|has been eliminated(?: from the game)?)\.?$/i;
 const DISPLAY_MAX_HP = 6;
 const MIN_AMMO_CAPACITY = 6;
 const DEFAULT_ARENA_HIT_DAMAGE = 3;

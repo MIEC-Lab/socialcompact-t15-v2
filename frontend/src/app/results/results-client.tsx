@@ -23,6 +23,8 @@ import {
 import { RoundTimeline } from "@/components/round-timeline";
 
 type LoadState = "loading" | "ready" | "error";
+const REMAINING_PLAYERS_EVENT_PATTERN =
+  /^the remaining players are:\s*(.*?)\.?$/i;
 
 function classifyRoundEvent(event: string): RoundEventType {
   const lowerEvent = event.toLowerCase();
@@ -57,41 +59,79 @@ function classifyRoundEvent(event: string): RoundEventType {
   return "event";
 }
 
+function splitRoundEventLines(event: string) {
+  return event
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function inferRemainingPlayersFromEvents(events: string[]) {
+  for (const event of [...events].reverse()) {
+    for (const line of splitRoundEventLines(event)) {
+      const match = line.match(REMAINING_PLAYERS_EVENT_PATTERN);
+
+      if (!match) {
+        continue;
+      }
+
+      const names = match[1]
+        .split(",")
+        .map((name) => name.trim())
+        .filter(Boolean);
+
+      if (names.length > 0) {
+        return names;
+      }
+    }
+  }
+
+  return [];
+}
+
 function convertRoundLogsToDetails(
   roundLogs: MatchResult["round_logs"]
 ): RoundDetailData[] {
-  return roundLogs.map((round) => ({
-    id: round.round,
-    events: round.events.map((event) => ({
-      text: event,
-      type: classifyRoundEvent(event),
-    })),
-    remainingPlayers: round.remaining_players,
-    chats: [],
-    predictions: [],
-    actions: round.events
-      .filter((event) => {
-        const eventType = classifyRoundEvent(event);
-        return eventType === "elimination" || eventType === "vote";
-      })
-      .map((event) => ({
-        player: `Round ${round.round}`,
-        action: event,
+  return roundLogs.map((round) => {
+    const inferredRemainingPlayers = inferRemainingPlayersFromEvents(round.events);
+    const remainingPlayers =
+      inferredRemainingPlayers.length > 0
+        ? inferredRemainingPlayers
+        : round.remaining_players;
+
+    return {
+      id: round.round,
+      events: round.events.map((event) => ({
+        text: event,
+        type: classifyRoundEvent(event),
       })),
-    observations: [
-      ...round.events.map((event, index) => ({
-        label: `Event ${index + 1}`,
-        value: event,
-      })),
-      {
-        label: "Remaining Players",
-        value:
-          round.remaining_players.length > 0
-            ? round.remaining_players.join(", ")
-            : "No remaining players recorded.",
-      },
-    ],
-  }));
+      remainingPlayers,
+      chats: [],
+      predictions: [],
+      actions: round.events
+        .filter((event) => {
+          const eventType = classifyRoundEvent(event);
+          return eventType === "elimination" || eventType === "vote";
+        })
+        .map((event) => ({
+          player: `Round ${round.round}`,
+          action: event,
+        })),
+      observations: [
+        ...round.events.map((event, index) => ({
+          label: `Event ${index + 1}`,
+          value: event,
+        })),
+        {
+          label: "Remaining Players",
+          value:
+            remainingPlayers.length > 0
+              ? remainingPlayers.join(", ")
+              : "No remaining players recorded.",
+        },
+      ],
+    };
+  });
 }
 
 function resolveApiBaseUrl(apiBaseParam: string | null) {

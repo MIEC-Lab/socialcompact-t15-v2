@@ -172,6 +172,12 @@ export function buildResultPresentation(result: MatchResult): ResultPresentation
   const hasNumericScores = players.some((player) => player.score !== 0);
   const winnerByArenaVerdict =
     result.source === "arena" && result.status === "completed" && !hasNumericScores;
+  const hasStructuredRemainingPlayers = result.round_logs.some(
+    (round) => round.remaining_players.length > 0
+  );
+  const finalRemainingPlayers =
+    result.round_logs[result.round_logs.length - 1]?.remaining_players ?? [];
+  const finalRemainingPlayerSet = new Set(finalRemainingPlayers);
   const ammoCapacity = Math.max(result.rounds + 3, MIN_AMMO_CAPACITY);
   const totals = new Map<string, CombatTotals>(
     players.map((player) => [
@@ -252,8 +258,13 @@ export function buildResultPresentation(result: MatchResult): ResultPresentation
       damageTaken: 0,
       eliminated: false,
     };
+    const eliminatedByFinalStanding =
+      hasRoundLogs &&
+      hasStructuredRemainingPlayers &&
+      !finalRemainingPlayerSet.has(player.name);
     const eliminated =
       playerTotals.eliminated ||
+      eliminatedByFinalStanding ||
       normalizedStatus === "eliminated" ||
       normalizedStatus === "failed";
     const shotsFired = hasRoundLogs
@@ -317,7 +328,10 @@ export function buildResultPresentation(result: MatchResult): ResultPresentation
         : "Closed the match on top of the leaderboard.",
     };
 
-  const activePlayers = snapshots.filter((player) => !player.eliminated).length;
+  const activePlayers =
+    hasRoundLogs && hasStructuredRemainingPlayers
+      ? finalRemainingPlayers.length
+      : snapshots.filter((player) => !player.eliminated).length;
   const eliminatedPlayers = snapshots.length - activePlayers;
   const hasEliminations = eliminatedPlayers > 0 || eliminationEventCount > 0;
   const totalEvents = result.round_logs.reduce(

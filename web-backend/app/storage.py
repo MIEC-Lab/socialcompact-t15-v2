@@ -1,3 +1,6 @@
+# Authorship: Yuhao Ye (E) owns backend persistence helpers.
+# Scope: Saves and loads public match results and logs.
+
 import json
 from pathlib import Path
 

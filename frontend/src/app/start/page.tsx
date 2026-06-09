@@ -1,5 +1,10 @@
 "use client";
 
+/*
+ * Authorship: Zichong You (B) owns the start page, match form, and request submission flow.
+ * Scope: Collects match settings and launches browser-side match creation.
+ */
+
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";

@@ -1,5 +1,10 @@
 "use client";
 
+/*
+ * Authorship: Chenle Chen (D) owns round timeline visualization.
+ * Scope: Shows per-round progression and key events.
+ */
+
 import { useState } from "react";
 import type { RoundDetailData, RoundEvent, RoundEventType } from "./round-detail";
 

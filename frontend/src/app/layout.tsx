@@ -1,3 +1,8 @@
+/*
+ * Authorship: Bowen Dong (A) owns the shared homepage/app shell for the public demo.
+ * Scope: Global app layout used across the V2 frontend.
+ */
+
 import type { Metadata } from "next";
 import "./globals.css";
 

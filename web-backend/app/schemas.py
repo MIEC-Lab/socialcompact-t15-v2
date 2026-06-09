@@ -1,3 +1,6 @@
+# Authorship: Yuhao Ye (E) owns backend request/response contracts.
+# Scope: Defines the public payload schemas used by the web demo.
+
 from pydantic import BaseModel, Field
 
 

@@ -1,3 +1,8 @@
+/*
+ * Authorship: Chonglin Dong (C) owns the top summary hero on the results page.
+ * Scope: Explains the final verdict and primary match summary.
+ */
+
 import Link from "next/link";
 import type { MatchResult } from "@/lib/types";
 import type { PlayerCombatSnapshot } from "./result-summary-model";

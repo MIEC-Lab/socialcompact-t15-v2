@@ -1,3 +1,6 @@
+# Authorship: Yuhao Ye (E) owns result and log polling endpoints.
+# Scope: Serves match result snapshots and live log payloads.
+
 from fastapi import APIRouter, HTTPException
 
 from app.schemas import (

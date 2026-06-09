@@ -1,3 +1,7 @@
+# Authorship: Yuhao Ye (E) owns the web-backend bridge into Arena and public Agent services.
+# Scope: Turns frontend match requests into background Arena runs and normalized web events.
+# Original-source note: This file adapts inherited Arena/Agent communication behavior from ReserveJudgement/SocialCOMPACT into the V2 web backend.
+
 import json
 import os
 import asyncio

@@ -1,3 +1,8 @@
+/*
+ * Authorship: Chonglin Dong (C) owns frontend result interpretation; Yuhao Ye (E) co-owns backend contract alignment.
+ * Scope: Transforms backend payloads into presentation-ready result summaries.
+ */
+
 import type { MatchResult } from "@/lib/types";
 
 const ATTACK_EVENT_PATTERN = /^(.*?) attacks (.*?) for (\d+) damage\.$/;

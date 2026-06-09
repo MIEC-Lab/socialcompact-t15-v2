@@ -1,3 +1,6 @@
+# Authorship: Yuhao Ye (E) owns the local simulation fallback used by the web backend.
+# Scope: Generates local/demo matches when the public Arena stack is unavailable.
+
 import random
 from uuid import uuid4
 

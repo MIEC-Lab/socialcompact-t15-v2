@@ -1,3 +1,8 @@
+/*
+ * Authorship: Chonglin Dong (C), Chenle Chen (D), and Yuhao Ye (E) share the frontend/backend data contract.
+ * Scope: Type definitions for results, logs, and public match payloads.
+ */
+
 export type PlayerResult = {
   name: string;
   score: number;

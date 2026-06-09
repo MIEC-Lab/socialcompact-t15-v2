@@ -1,3 +1,8 @@
+/*
+ * Authorship: Bowen Dong (A) owns the homepage experience and top-level project framing.
+ * Scope: Public landing page for the SocialCOMPACT V2 demo.
+ */
+
 import Link from "next/link";
 
 export default function Home() {

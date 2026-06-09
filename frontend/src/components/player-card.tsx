@@ -1,3 +1,8 @@
+/*
+ * Authorship: Chonglin Dong (C) owns per-player result card presentation.
+ * Scope: Displays player state, score, and summary details.
+ */
+
 import type { PlayerCombatSnapshot } from "./result-summary-model";
 
 type PlayerCardProps = {

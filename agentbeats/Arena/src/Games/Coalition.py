@@ -1,3 +1,7 @@
+# Authorship: Yuhao Ye (E) owns the V2 backend/Arena integration around this inherited service code; Bowen Dong (A) owns Render deployment of the surrounding public service; Runze Chen (F) owns public verification of the deployed endpoints.
+# Scope: Inherited Arena/Agent service code used by the public V2 deployment.
+# Original-source note: The core Arena/Agent/A2A logic in this file is inherited from the upstream ReserveJudgement/SocialCOMPACT repository.
+
 import math
 import random
 from .GameModule import *

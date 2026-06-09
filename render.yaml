@@ -1,3 +1,6 @@
+# Authorship: Bowen Dong (A) owns the public Render deployment configuration; Runze Chen (F) owns public deployment verification.
+# Scope: Render service wiring for the backend, Arena, and public Agent endpoints.
+
 services:
   - type: web
     name: socialcompact-web-backend

@@ -1,3 +1,8 @@
+/*
+ * Authorship: Chenle Chen (D) owns live chat/log process visualization.
+ * Scope: Displays process-level event content on the results page.
+ */
+
 export type ChatMessage = {
   from: string;
   to: string;

@@ -1,3 +1,8 @@
+/*
+ * Authorship: Zichong You (B) owns start-flow API usage; Yuhao Ye (E) owns backend contract alignment; Runze Chen (F) owns public deployment URL verification.
+ * Scope: Shared frontend helpers for talking to the public backend.
+ */
+
 export const DEFAULT_API_BASE_URL = "http://127.0.0.1:8000";
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
 

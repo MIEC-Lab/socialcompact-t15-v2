@@ -1,3 +1,8 @@
+/*
+ * Authorship: Bowen Dong (A) owns the shared app shell; Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) co-own theater/results styling.
+ * Scope: Global styling plus the mini theater and results presentation layers.
+ */
+
 @import "tailwindcss";
 
 :root {

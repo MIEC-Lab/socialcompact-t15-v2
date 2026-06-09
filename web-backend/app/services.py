@@ -1,3 +1,6 @@
+# Authorship: Yuhao Ye (E) owns backend orchestration, match lifecycle, and fallback logic.
+# Scope: Coordinates live Arena runs, local fallback, and stored results.
+
 from datetime import UTC, datetime
 from uuid import uuid4
 

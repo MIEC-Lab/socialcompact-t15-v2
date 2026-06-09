@@ -1,3 +1,8 @@
+/*
+ * Authorship: Chonglin Dong (C) owns player-card layout on the results page.
+ * Scope: Arranges per-player result cards for the V2 summary view.
+ */
+
 import { PlayerCard } from "./player-card";
 import type { PlayerCombatSnapshot } from "./result-summary-model";
 

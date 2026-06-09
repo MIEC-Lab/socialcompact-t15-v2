@@ -1,3 +1,8 @@
+/*
+ * Authorship: Chenle Chen (D) owns live log rendering and process observability.
+ * Scope: Shows the running event stream for the V2 web demo.
+ */
+
 import type { GameLogEvent } from "@/lib/types";
 
 type GameProcessLogProps = {

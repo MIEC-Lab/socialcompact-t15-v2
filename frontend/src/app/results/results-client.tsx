@@ -1,5 +1,10 @@
 "use client";
 
+/*
+ * Authorship: Chonglin Dong (C) owns the results overview composition; Chenle Chen (D) owns process/timeline integration.
+ * Scope: Client-side orchestration for summary cards, logs, timeline, and theater on the results page.
+ */
+
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -150,6 +155,7 @@ function resolveApiBaseUrl(apiBaseParam: string | null) {
   return getPublicApiBaseUrl();
 }
 
+// C owns the summary composition in this component, while D owns the live process/timeline wiring that feeds the page.
 export function ResultsClient() {
   const searchParams = useSearchParams();
   const explicitMatchId = searchParams.get("matchId");

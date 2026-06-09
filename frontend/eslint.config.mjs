@@ -1,3 +1,8 @@
+/*
+ * Authorship: Bowen Dong (A) owns shared frontend/project setup; Runze Chen (F) owns Vercel deployment verification.
+ * Scope: Frontend lint configuration for the V2 web demo.
+ */
+
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";

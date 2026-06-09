@@ -1,3 +1,8 @@
+/*
+ * Authorship: Chonglin Dong (C) owns summary highlight cards for the results page.
+ * Scope: Condenses key result metrics into presentation-ready highlights.
+ */
+
 import type { MatchResult } from "@/lib/types";
 import type { ResultPresentation } from "./result-summary-model";
 

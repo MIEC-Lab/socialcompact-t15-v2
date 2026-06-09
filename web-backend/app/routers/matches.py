@@ -1,3 +1,6 @@
+# Authorship: Yuhao Ye (E) owns match-creation endpoints.
+# Scope: Starts matches and returns public match IDs.
+
 from fastapi import APIRouter, HTTPException
 
 from app.schemas import MatchCreateResponse, MatchLogsResponse, MatchResultResponse, StartMatchRequest

@@ -1,3 +1,8 @@
+/*
+ * Authorship: Chenle Chen (D) owns round-detail visualization.
+ * Scope: Explains what happened inside each round of the match.
+ */
+
 export type RoundChat = {
   speaker: string;
   message: string;

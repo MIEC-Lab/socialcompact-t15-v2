@@ -1,3 +1,6 @@
+# Authorship: Yuhao Ye (E) owns backend game metadata endpoints.
+# Scope: Exposes supported games to the frontend.
+
 from fastapi import APIRouter
 
 from app.schemas import GameListResponse

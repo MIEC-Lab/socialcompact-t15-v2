@@ -1,3 +1,6 @@
+# Authorship: Yuhao Ye (E) owns the FastAPI application entry point.
+# Scope: Bootstraps the public backend service.
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 

@@ -1,3 +1,8 @@
+/*
+ * Authorship: Zichong You (B) owns character design markup; Chonglin Dong (C) owns results-page layout integration; Chenle Chen (D) owns animation and event-driven behavior.
+ * Scope: Mini theater that visualizes agent dialogue, prediction, and combat beats during a match.
+ */
+
 import type { CSSProperties } from "react";
 
 import type { GameLogEvent, MatchResult } from "@/lib/types";
@@ -54,6 +59,7 @@ const ATTACK_EVENT_PATTERN = /^(.*?) attacks (.*?) for (\d+) damage\.$/;
 const HIT_EVENT_PATTERN = /^(.*?) hit (.*?)!$/;
 const MISSED_EVENT_PATTERN = /^(.*?) attacked (.*?) but missed!\.$/;
 
+// Shared ownership inside this file: B shaped the character presentation, C integrated the stage into the results layout, and D implemented the live event-driven behavior.
 export function AgentMiniTheater({
   result,
   processEvents,

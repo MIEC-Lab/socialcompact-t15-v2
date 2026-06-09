@@ -1,3 +1,6 @@
+# Authorship: Bowen Dong (A) owns repository coordination and cleanup.
+# Scope: Keeps local artifacts and non-code deliverables out of the tracked repository.
+
 # Secrets
 .env
 *.env
@@ -33,3 +36,8 @@ tmp/
 Thumbs.db
 .vscode/
 .idea/
+
+# Keep defense slide decks local-only
+deliverables/defense/*.ppt
+deliverables/defense/*.pptx
+

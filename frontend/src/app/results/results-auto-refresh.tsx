@@ -1,5 +1,10 @@
 "use client";
 
+/*
+ * Authorship: Chenle Chen (D) owns the live refresh behavior for process visualization.
+ * Scope: Keeps result views in sync while live logs and timeline data update.
+ */
+
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 

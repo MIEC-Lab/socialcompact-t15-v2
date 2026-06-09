@@ -1,3 +1,6 @@
+# Authorship: Yuhao Ye (E) owns backend state structures for the public V2 flow.
+# Scope: In-memory stores that support match results and logs.
+
 from app.schemas import GameLogEvent, MatchResultResponse, PlayerResult
 
 

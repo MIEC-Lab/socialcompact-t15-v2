@@ -1,3 +1,8 @@
+/*
+ * Authorship: Chonglin Dong (C) owns the results entry route and results-page shell.
+ * Scope: Route wrapper for the V2 results experience.
+ */
+
 import { Suspense } from "react";
 import { ResultsClient } from "./results-client";
 

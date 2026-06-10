@@ -1,4 +1,8 @@
-﻿<!doctype html>
+<!--
+  Authorship: Runze Chen (F) owns the HyperFrames final-video assembly for the CS183 submission.
+  Scope: HTML composition for the formal V2 comparison video, including hook, architecture, A2A, Manim, and demo scenes.
+-->
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -11,163 +15,349 @@
       id="root"
       data-composition-id="main"
       data-start="0"
-      data-duration="90"
+      data-duration="300"
       data-width="1920"
       data-height="1080"
     >
-      <div class="grid"></div>
-
-      <section class="clip scene" id="hook" data-start="0" data-duration="8" data-track-index="1">
-        <div class="eyebrow">CS183 Project Explainer</div>
-        <h1>Can two AI agents play a social survival game live?</h1>
-        <p class="lede">SocialCOMPACT turns multi-agent negotiation, prediction, and action into a deployed web experience.</p>
-      </section>
-      <div class="clip caption" id="cap-1" data-start="0" data-duration="8" data-track-index="20">
-        What if a web app could show two AI agents negotiating, predicting, and acting in a social survival game, live?
+      <div class="atmosphere">
+        <div class="grid"></div>
+        <div class="vignette"></div>
+        <div class="spark spark-a"></div>
+        <div class="spark spark-b"></div>
+        <div class="spark spark-c"></div>
       </div>
 
-      <section class="clip scene" id="overview" data-start="8" data-duration="10" data-track-index="2">
+      <section class="clip scene scene-hero" id="hero" data-start="0" data-duration="18" data-track-index="1">
+        <div class="hook-layout">
+          <div class="survivor-stage">
+            <div class="stage-header">
+              <span>Agent Mini Theater</span>
+              <span>real project characters</span>
+            </div>
+            <div class="actual-theater-window">
+              <img src="../assets/formal/theater_stage_actual.png" alt="Actual Agent Mini Theater characters" />
+            </div>
+            <div class="secret-card">secret plan<br /><strong>betray</strong></div>
+            <div class="attack-line"></div>
+            <div class="betray-stamp">BETRAY</div>
+            <div class="hook-alert hook-v1">V1: waiting...</div>
+            <div class="hook-alert hook-v2">V2: chat -> predict -> act -> logs</div>
+          </div>
+
+          <div class="hook-copy">
+            <div class="eyebrow">Hook: why this matters</div>
+            <h1>Can users trust an AI game they cannot see?</h1>
+            <p class="lede">
+              SocialCOMPACT is not just a result page. It is a multi-Agent Survivor match where conversation,
+              prediction, and action need to become visible evidence.
+            </p>
+            <div class="hook-metrics">
+              <div><b>V1</b><span>black-box wait</span></div>
+              <div><b>V2</b><span>observable run</span></div>
+              <div><b>Goal</b><span>public demo</span></div>
+            </div>
+            <div class="hero-question">
+              In this 5-minute version comparison, we show how the codebase moved from "it runs" to "users can inspect
+              how it runs."
+            </div>
+          </div>
+        </div>
+      </section>
+      <div class="clip subtitle" id="cap-1" data-start="0" data-duration="18" data-track-index="30">
+        Before the architecture details, here is the problem: if a multi-Agent match is invisible, users only wait. The
+        redesign turns chat, prediction, decisions, and results into visible evidence.
+      </div>
+
+      <section class="clip scene scene-overview" id="overview" data-start="18" data-duration="24" data-track-index="2">
         <div class="eyebrow">Project overview</div>
-        <h2>Vercel frontend, FastAPI backend, Render Arena, and two Agent services.</h2>
+        <h2>What the project does, who uses it, and what the UI returns.</h2>
+        <div class="overview-grid">
+          <div class="text-panel">
+            <div class="mini-label">Problem</div>
+            <p>
+              SocialCOMPACT evaluates social intelligence in AI agents by running a Survivor-style multi-agent game.
+            </p>
+            <div class="mini-label">Inputs</div>
+            <ul>
+              <li>player names</li>
+              <li>round count</li>
+              <li>backend URL</li>
+              <li>Agent service URLs</li>
+            </ul>
+            <div class="mini-label">Outputs</div>
+            <ul>
+              <li>match result</li>
+              <li>player state cards</li>
+              <li>live logs</li>
+              <li>Agent artifacts</li>
+            </ul>
+          </div>
+          <div class="screenshot-stack">
+            <div class="shot-card shot-home"><img src="../assets/formal/homepage_live.png" alt="homepage" /></div>
+            <div class="shot-card shot-start"><img src="../assets/formal/start_page_live.png" alt="start page" /></div>
+            <div class="shot-card shot-result"><img src="../assets/formal/results_cards.png" alt="results cards" /></div>
+          </div>
+        </div>
       </section>
-      <div class="clip card overview-copy" id="overview-card" data-start="8" data-duration="10" data-track-index="3">
-        <span class="pill">Input -> Output</span>
-        <p>Input: player names and service URLs.</p>
-        <p>Output: a visible Survivor match with live Agent artifacts and a final result.</p>
-      </div>
-      <img
-        class="clip architecture"
-        id="architecture"
-        data-start="8"
-        data-duration="10"
-        data-track-index="4"
-        src="../assets/diagrams/architecture.svg"
-        alt="SocialCOMPACT architecture"
-      />
-      <div class="clip caption" id="cap-2" data-start="8" data-duration="10" data-track-index="20">
-        SocialCOMPACT is a CS183 deployment project for multi-agent game evaluation.
+      <div class="clip subtitle" id="cap-2" data-start="18" data-duration="24" data-track-index="30">
+        The user enters match settings in the browser, starts a Survivor game, and expects more than a final winner:
+        they want visible logs, player state, and a readable explanation of what the Agents are doing.
       </div>
 
-      <section class="clip scene" id="versions-title" data-start="18" data-duration="4" data-track-index="5">
-        <div class="eyebrow">Version comparison</div>
-        <h1>V1 made the demo work. V2 made the demo understandable.</h1>
+      <section class="clip scene scene-diagram" id="architecture" data-start="42" data-duration="24" data-track-index="3">
+        <div class="eyebrow">Overall architecture</div>
+        <h2>One match travels through browser request, backend coordination, Arena execution, and frontend polling.</h2>
+        <div class="image-frame large-frame">
+          <img src="../assets/formal/architecture_flow.png" alt="match flow architecture" />
+        </div>
+        <div class="callout-bar">
+          Browser submits settings -> backend creates match_id -> Arena runs in background -> frontend polls UI-ready
+          state and logs.
+        </div>
       </section>
-
-      <article class="clip card version-card v1" id="v1-card" data-start="22" data-duration="15" data-track-index="6">
-        <span class="pill">Version 1</span>
-        <h3>MIEC submission</h3>
-        <ul>
-          <li>Commit f22f70c</li>
-          <li>First working web flow</li>
-          <li>Polling logs introduced</li>
-          <li>Still felt opaque during long runs</li>
-        </ul>
-      </article>
-      <article class="clip card version-card v2" id="v2-card" data-start="22" data-duration="15" data-track-index="7">
-        <span class="pill">Version 2</span>
-        <h3>Public live demo</h3>
-        <ul>
-          <li>Vercel + Render deployment</li>
-          <li>Responsive health checks</li>
-          <li>Background Arena orchestration</li>
-          <li>Live Agent mini theater</li>
-        </ul>
-      </article>
-      <div class="clip caption" id="cap-3" data-start="18" data-duration="19" data-track-index="20">
-        Version 1 exposed the first working web flow. Version 2 redesigns the run around asynchronous orchestration and live artifacts.
+      <div class="clip subtitle" id="cap-3" data-start="42" data-duration="24" data-track-index="30">
+        At a high level, the browser only sends configuration. The backend owns match creation and orchestration. Arena
+        and Agents generate raw artifacts. The frontend keeps polling until the run becomes a readable result page.
       </div>
 
-      <section class="clip scene" id="manim-title" data-start="37" data-duration="4" data-track-index="8">
-        <div class="eyebrow">Manim technical animation</div>
-        <h1>The core change is an event pipeline.</h1>
+      <section class="clip scene scene-v1" id="version-1" data-start="66" data-duration="30" data-track-index="4">
+        <div class="eyebrow">Version 1 explanation</div>
+        <h2>Version 1 proved the web flow could run, but the long match stayed mostly opaque.</h2>
+        <div class="compare-grid">
+          <div class="version-card danger-card">
+            <div class="mini-label">What V1 already achieved</div>
+            <ul>
+              <li>start a web match</li>
+              <li>wait for the game to finish</li>
+              <li>show a final result page</li>
+            </ul>
+          </div>
+          <div class="version-card neutral-card black-box-card">
+            <div class="spinner-ring"></div>
+            <strong>queued / running / final result</strong>
+            <p>The user could tell that a run existed, but not what the Agents were thinking or doing.</p>
+          </div>
+          <div class="version-card warning-card">
+            <div class="mini-label">Main limitations</div>
+            <ul>
+              <li>little observability during the run</li>
+              <li>public access still fragile</li>
+              <li>localhost dependency hurt real usability</li>
+            </ul>
+          </div>
+        </div>
       </section>
-      <div class="clip card manim-frame" id="manim-frame" data-start="41" data-duration="18" data-track-index="9">
-        <div class="manim-placeholder">Manim clip: V1 blocking run -> V2 live event stream</div>
+      <div class="clip subtitle" id="cap-4" data-start="66" data-duration="30" data-track-index="30">
+        Version 1 was an important first milestone. It made the web flow possible, but it still behaved like a black
+        box: users mostly waited for a final answer instead of seeing the match process unfold.
       </div>
+
+      <section class="clip scene scene-blockers" id="blockers" data-start="96" data-duration="30" data-track-index="5">
+        <div class="eyebrow">Evidence from real blockers</div>
+        <h2>Version 1 exposed four system problems, not just isolated tooling errors.</h2>
+        <div class="boss-grid">
+          <div class="boss-pair">
+            <div class="boss-head">Version traceability under team pressure</div>
+            <div class="boss-images">
+              <img src="../assets/screenshots/problems/01-git-network.png" alt="git failure" />
+              <img src="../assets/screenshots/problems/01-git-network-solved.png" alt="git solved" />
+            </div>
+            <div class="boss-note">We needed a stable branch-and-push flow so evidence, commits, and deployment updates stayed auditable.</div>
+          </div>
+          <div class="boss-pair">
+            <div class="boss-head">Frontend build reproducibility</div>
+            <div class="boss-images">
+              <img src="../assets/screenshots/problems/02-npm-install.png" alt="npm failure" />
+              <img src="../assets/screenshots/problems/02-npm-install-solved.png" alt="npm solved" />
+            </div>
+            <div class="boss-note">A web demo is not trustworthy if teammates cannot rebuild the same frontend consistently.</div>
+          </div>
+          <div class="boss-pair">
+            <div class="boss-head">One long request could not drive a web match</div>
+            <div class="boss-images">
+              <img src="../assets/screenshots/problems/03-vercel-build.png" alt="vercel failure" />
+              <img src="../assets/screenshots/problems/03-vercel-build-solved.png" alt="vercel solved" />
+            </div>
+            <div class="boss-note">The browser needed match_id plus polling instead of waiting for a blocking Arena run to finish.</div>
+          </div>
+          <div class="boss-pair">
+            <div class="boss-head">Localhost was not a public multi-service product</div>
+            <div class="boss-images">
+              <img src="../assets/screenshots/problems/04-public-backend.png" alt="localhost problem" />
+              <img src="../assets/screenshots/problems/04-public-backend-solved.png" alt="public backend solved" />
+            </div>
+            <div class="boss-note">We had to move from a local experiment to public Vercel and Render services with health checks and fallback.</div>
+          </div>
+        </div>
+      </section>
+      <div class="clip subtitle" id="cap-5" data-start="96" data-duration="30" data-track-index="30">
+        The visible failures were only the surface. Underneath them were four deeper engineering problems: traceable
+        collaboration, reproducible frontend builds, asynchronous web orchestration, and public multi-service
+        deployment. Those are the reasons Version 2 had to be redesigned.
+      </div>
+
+      <section class="clip scene scene-diagram" id="backend" data-start="126" data-duration="36" data-track-index="6">
+        <div class="eyebrow">Version 2 explanation</div>
+        <h2>The backend became the real coordinator: fast reply, background run, state storage, polling APIs.</h2>
+        <div class="image-frame large-frame">
+          <img src="../assets/formal/backend_architecture.png" alt="backend architecture" />
+        </div>
+        <div class="three-tags">
+          <span>input: match settings</span>
+          <span>processing: orchestrate Arena in background</span>
+          <span>output: UI-ready JSON for results page</span>
+        </div>
+      </section>
+      <div class="clip subtitle" id="cap-6" data-start="126" data-duration="36" data-track-index="30">
+        Version 2 is not just a prettier frontend. The deeper change is in the backend: it creates a match id
+        immediately, launches Arena asynchronously, stores structured events, and serves stable polling APIs to the UI.
+      </div>
+
+      <section class="clip scene scene-diagram" id="a2a" data-start="162" data-duration="30" data-track-index="7">
+        <div class="eyebrow">A2A communication path</div>
+        <h2>Arena brokers the Agent conversation instead of letting the two Agents call each other directly.</h2>
+        <div class="image-frame large-frame">
+          <img src="../assets/formal/a2a_pipeline.png" alt="A2A communication path" />
+        </div>
+        <div class="callout-bar">
+          Backend -> Arena -> Agent endpoint -> streamed artifacts -> normalized logs -> frontend polling
+        </div>
+      </section>
+      <div class="clip subtitle" id="cap-7" data-start="162" data-duration="30" data-track-index="30">
+        This is where the A2A logic matters. Arena is the conversation hub. It preserves context per Agent URL, sends
+        prompts to each Agent endpoint, collects replies, and streams artifacts back upstream to the backend.
+      </div>
+
+      <section class="clip scene scene-diagram" id="game-logic" data-start="192" data-duration="30" data-track-index="8">
+        <div class="eyebrow">Game logic</div>
+        <h2>The Survivor loop is not one action. Each round moves through chat, prediction, decision, action, and
+          observation.</h2>
+        <div class="image-frame large-frame">
+          <img src="../assets/formal/survivor_logic.png" alt="survivor logic" />
+        </div>
+        <div class="three-tags">
+          <span>talk</span>
+          <span>predict + decide</span>
+          <span>process actions + send observations</span>
+        </div>
+      </section>
+      <div class="clip subtitle" id="cap-8" data-start="192" data-duration="30" data-track-index="30">
+        The game itself also becomes more understandable in Version 2. Instead of treating the match as one mysterious
+        result, the video can now show the round loop: communication, prediction, action processing, and feedback.
+      </div>
+
+      <section class="clip scene scene-manim" id="manim" data-start="222" data-duration="24" data-track-index="9">
+        <div class="eyebrow">CS concept animation</div>
+        <h2>Manim visualizes the technical difference between blocking flow and event-driven orchestration.</h2>
+        <div class="video-grid">
+          <div class="video-card">
+            <div class="mini-label">Comparison demo</div>
+            <div class="manim-placeholder"></div>
+          </div>
+          <div class="video-card">
+            <div class="mini-label">Pipeline animation</div>
+            <div class="manim-placeholder"></div>
+          </div>
+        </div>
+      </section>
       <video
-        class="clip manim-video manim-video-clip"
-        id="manim-video"
-        data-start="41"
-        data-duration="18"
-        data-track-index="15"
-        src="../assets/manim/socialcompact_pipeline.mp4"
+        class="clip manim-video manim-float-left"
+        id="manim-comparison"
+        data-start="222"
+        data-duration="24"
+        data-track-index="19"
+          src="../manim/comparison_demo_loop.mp4"
         muted
         autoplay
+        loop
         playsinline
       ></video>
-      <div class="clip caption" id="cap-4" data-start="37" data-duration="22" data-track-index="20">
-        The backend returns a match id immediately, runs the Arena in the background, stores structured events, and the frontend polls them.
+      <video
+        class="clip manim-video manim-float-right"
+        id="manim-pipeline"
+        data-start="222"
+        data-duration="24"
+        data-track-index="20"
+          src="../assets/manim/socialcompact_pipeline_loop.mp4"
+        muted
+        autoplay
+        loop
+        playsinline
+      ></video>
+      <div class="clip subtitle" id="cap-9" data-start="222" data-duration="24" data-track-index="30">
+        We used custom Manim scenes because this CS concept is fundamentally about process. The animation makes the
+        invisible orchestration visible: Version 1 waits, while Version 2 streams inspectable state into the UI.
       </div>
 
-      <section class="clip scene" id="metrics-title" data-start="59" data-duration="4" data-track-index="10">
-        <div class="eyebrow">Evidence and metrics</div>
-        <h1>What improved?</h1>
+      <section class="clip scene scene-compare" id="compare" data-start="246" data-duration="24" data-track-index="10">
+        <div class="eyebrow">Comparison and evidence</div>
+        <h2>Version 2 improves observability, public usability, and deployable evidence.</h2>
+        <div class="compare-layout">
+          <div class="metrics-column">
+            <div class="metric-card">
+              <span class="metric-label">Version 1</span>
+              <strong>working flow, but mostly opaque</strong>
+              <p>queued / running / final result, weaker public visibility</p>
+            </div>
+            <div class="metric-card positive">
+              <span class="metric-label">Version 2</span>
+              <strong>observable public demo</strong>
+              <p>chat, reasoning, prediction, decision, observation, final verdict</p>
+            </div>
+            <div class="metric-row">
+              <div class="small-metric"><b>4</b><span>deployed services</span></div>
+              <div class="small-metric"><b>6</b><span>visible artifact stages</span></div>
+            </div>
+          </div>
+          <div class="image-frame medium-frame">
+            <img src="../assets/formal/deployment_grid.png" alt="deployment proof" />
+          </div>
+        </div>
       </section>
-      <div class="clip metrics-grid" id="metrics-grid" data-start="63" data-duration="11" data-track-index="11">
-        <div class="card metric">
-          <div class="label">Running feedback</div>
-          <div class="before">V1: queued or running state</div>
-          <div class="after">V2: chat, reasoning, prediction, decision</div>
-        </div>
-        <div class="card metric">
-          <div class="label">Deployment</div>
-          <div class="before">V1: local-oriented flow</div>
-          <div class="after">V2: Vercel + Render public services</div>
-        </div>
-        <div class="card metric">
-          <div class="label">Cold starts</div>
-          <div class="before">V1: could appear stalled</div>
-          <div class="after">V2: health checks and clearer retry guidance</div>
-        </div>
-        <div class="card metric">
-          <div class="label">Understanding</div>
-          <div class="before">V1: final result oriented</div>
-          <div class="after">V2: process visible through logs</div>
-        </div>
-      </div>
-      <div class="clip caption" id="cap-5" data-start="59" data-duration="15" data-track-index="20">
-        The evidence is visible in the UI: Agent artifacts are no longer hidden behind a generic loading state.
+      <div class="clip subtitle" id="cap-10" data-start="246" data-duration="24" data-track-index="30">
+        Our comparison claim is not only that Version 2 looks better. It is better supported by evidence: public
+        deployment, visible Agent artifacts, stable health endpoints, and a clearer explanation of the run.
       </div>
 
-      <section class="clip scene" id="demo-title" data-start="74" data-duration="3" data-track-index="12">
-        <div class="eyebrow">Deployed demo</div>
-        <h1>The match becomes a mini theater.</h1>
-      </section>
-      <div class="clip demo-ui" id="demo-ui" data-start="77" data-duration="8" data-track-index="13">
-        <div class="bubble left">Xavier: I am watching your ammo and moving first.</div>
-        <div class="bubble right">Ronda: Then speak quickly. I am not giving you room.</div>
-        <div class="mini-stage">
-          <svg class="stick left" viewBox="0 0 120 180">
-            <circle cx="60" cy="39" r="29" fill="rgba(34,211,238,.18)" stroke="#67e8f9" stroke-width="4" />
-            <circle cx="52" cy="38" r="5" fill="#fff" />
-            <circle cx="74" cy="38" r="5" fill="#fff" />
-            <rect x="44" y="55" width="32" height="9" rx="5" fill="#fff" />
-            <path d="M60 67 L60 118 M60 84 L26 71 M60 84 L94 71 M60 118 L34 158 M60 118 L86 158" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" />
-          </svg>
-          <svg class="stick right" viewBox="0 0 120 180">
-            <circle cx="60" cy="39" r="29" fill="rgba(74,222,128,.16)" stroke="#86efac" stroke-width="4" />
-            <circle cx="46" cy="38" r="5" fill="#fff" />
-            <circle cx="68" cy="38" r="5" fill="#fff" />
-            <rect x="44" y="55" width="32" height="9" rx="5" fill="#fff" />
-            <path d="M60 67 L60 118 M60 84 L26 71 M60 84 L94 71 M60 118 L34 158 M60 118 L86 158" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" />
-          </svg>
+      <section class="clip scene scene-demo" id="demo" data-start="270" data-duration="22" data-track-index="11">
+        <div class="eyebrow">Results and demo</div>
+        <h2>The final page now behaves like a real product surface instead of a static report.</h2>
+        <div class="demo-grid">
+          <div class="image-frame demo-main">
+            <img src="../assets/formal/results_overview.png" alt="results overview" />
+          </div>
+          <div class="image-frame demo-side">
+            <img src="../assets/formal/results_logs.png" alt="results logs" />
+          </div>
         </div>
-      </div>
-      <div class="clip caption" id="cap-6" data-start="74" data-duration="11" data-track-index="20">
-        Users can now watch the Agent conversation, inspect predictions, and verify whether the result came from the real Arena.
+      </section>
+      <div class="clip subtitle" id="cap-11" data-start="270" data-duration="22" data-track-index="30">
+        In the final demo, users can follow live logs, inspect player state, and see whether the run comes from the
+        real Arena path. That makes the system more understandable and more playable.
       </div>
 
-      <section class="clip scene" id="reflection" data-start="85" data-duration="5" data-track-index="14">
-        <div class="eyebrow">Reflection</div>
-        <h1>More playable, more observable, still operationally complex.</h1>
-        <div class="takeaway-list">
-          <div class="card"><strong>Worked</strong>Live Agent state is visible.</div>
-          <div class="card"><strong>Limitation</strong>Free Render services can cold start.</div>
-          <div class="card"><strong>Next</strong>Add tie handling, replay storage, and preflight checks.</div>
+      <section class="clip scene scene-reflection" id="reflection" data-start="292" data-duration="8" data-track-index="12">
+        <div class="eyebrow">Reflection and group process</div>
+        <h1>Version 2 is more explainable and more usable, but it costs more operational complexity.</h1>
+        <p>
+          Next steps: add persistent replay storage, stronger tie handling, and a preflight health check before each
+          match. The final split also became clearer: deployment, backend orchestration, UI, logs, and mini theater
+          work were owned by different teammates.
+        </p>
+        <div class="role-note">
+          <span>A: GitHub workflow, homepage, Render deployment</span>
+          <span>B: start page, match form, mini theater character design</span>
+          <span>C: results overview, player cards, mini theater layout</span>
+          <span>D: live logs, timeline, mini theater animation</span>
+          <span>E: FastAPI backend, Arena integration, web orchestration</span>
+          <span>F: Vercel deployment, public verification, final video</span>
         </div>
       </section>
-      <div class="clip caption" id="cap-7" data-start="85" data-duration="5" data-track-index="20">
-        The trade-off is operational complexity: four deployed services must stay healthy.
+      <div class="clip subtitle" id="cap-12" data-start="292" data-duration="8" data-track-index="30">
+        The main trade-off is operational complexity: more services, more health concerns, and more cold-start risk.
+        But that trade-off bought us a public demo users can actually understand. Our group process mattered too:
+        A handled coordination and Render deployment, B/C/D split the mini theater and results experience, E owned
+        backend orchestration, and F handled Vercel deployment plus the final video.
       </div>
     </div>
     <script src="./script.js"></script>
@@ -177,5 +367,3 @@
     </script>
   </body>
 </html>
-
-

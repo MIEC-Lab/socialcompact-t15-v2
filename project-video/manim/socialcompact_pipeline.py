@@ -1,3 +1,8 @@
+#
+# Authorship: Runze Chen (F) owns the Manim-based CS concept animation for the final project video.
+# Scope: Custom technical animation showing Version 1 blocking flow versus Version 2 event-driven orchestration.
+#
+
 from manim import *
 
 
@@ -8,6 +13,7 @@ class SocialCompactPipeline(Scene):
         manim -pqh project-video/manim/socialcompact_pipeline.py SocialCompactPipeline
     """
 
+    # Author: Runze Chen (F) - orchestrates the full Manim comparison scene shown in the final video.
     def construct(self):
         self.camera.background_color = "#06111f"
 
@@ -38,6 +44,7 @@ class SocialCompactPipeline(Scene):
         self.animate_v2()
         self.compare_takeaway()
 
+    # Author: Runze Chen (F) - shared visual helper for labeled scene headers in the Manim clip.
     def section_label(self, text, color):
         label = Text(text, font="Arial", font_size=21, weight=BOLD)
         box = RoundedRectangle(
@@ -50,6 +57,7 @@ class SocialCompactPipeline(Scene):
         )
         return VGroup(box, label)
 
+    # Author: Runze Chen (F) - shared helper for drawing pipeline and service boxes in the technical animation.
     def service_box(self, text, color, width=2.15):
         label = Text(text, font="Arial", font_size=17, weight=BOLD)
         box = RoundedRectangle(
@@ -62,6 +70,7 @@ class SocialCompactPipeline(Scene):
         )
         return VGroup(box, label)
 
+    # Author: Runze Chen (F) - animates the Version 1 blocking and mostly opaque match flow.
     def animate_v1(self):
         frontend = self.service_box("Frontend", BLUE_B).move_to(LEFT * 5.1 + UP * 1.05)
         backend = self.service_box("Backend", GREEN_B).move_to(LEFT * 3.05 + UP * 0.0)
@@ -98,6 +107,7 @@ class SocialCompactPipeline(Scene):
         self.play(Create(arrow3), FadeIn(result, shift=UP * 0.2), Write(hidden), run_time=1.1)
         self.wait(0.5)
 
+    # Author: Runze Chen (F) - animates the Version 2 background orchestration and live event stream.
     def animate_v2(self):
         x = 3.35
         services = [
@@ -158,6 +168,7 @@ class SocialCompactPipeline(Scene):
         self.play(Write(insight), run_time=1.0)
         self.wait(0.5)
 
+    # Author: Runze Chen (F) - closes the clip with the V1-versus-V2 technical takeaway.
     def compare_takeaway(self):
         panel = RoundedRectangle(
             width=10.7,

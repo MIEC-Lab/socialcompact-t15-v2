@@ -1,3 +1,6 @@
+# Authorship: Runze Chen (F) owns the final HyperFrames export pipeline for the CS183 project video.
+# Scope: Installs local tooling, ensures a browser binary is available, and renders the final comparison MP4.
+
 $ErrorActionPreference = "Stop"
 
 $hyperframesDir = Join-Path $PSScriptRoot "hyperframes"

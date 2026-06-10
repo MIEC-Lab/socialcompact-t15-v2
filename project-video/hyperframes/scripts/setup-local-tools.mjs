@@ -1,3 +1,8 @@
+/*
+ * Authorship: Runze Chen (F) owns the local video-render tooling used by the final HyperFrames pipeline.
+ * Scope: Writes FFmpeg and FFprobe shims so the project-video render workflow can run reproducibly on Windows.
+ */
+
 import fs from "node:fs";
 import path from "node:path";
 import ffmpegPath from "ffmpeg-static";

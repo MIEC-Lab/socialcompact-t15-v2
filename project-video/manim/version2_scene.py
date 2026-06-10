@@ -1,11 +1,18 @@
+#
+# Authorship: Runze Chen (F) owns the Version 2 Manim cut used in the project-video pipeline.
+# Scope: Entry scene focused on the deployed live-demo architecture and streamed event visibility.
+#
+
 from manim import *
 
 from socialcompact_pipeline import SocialCompactPipeline
 
 
+# Author: Runze Chen (F) - wrapper scene for the Version 2-focused Manim segment.
 class Version2Scene(SocialCompactPipeline):
     """Assignment entry point for the Version 2 portion of the comparison."""
 
+    # Author: Runze Chen (F) - composes the Version 2-only title, label, and inherited V2 animation.
     def construct(self):
         self.camera.background_color = "#06111f"
 

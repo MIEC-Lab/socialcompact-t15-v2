@@ -1,3 +1,6 @@
+# Authorship: Runze Chen (F) owns the Manim render pipeline used for the submitted CS concept clip.
+# Scope: Prepares the Python environment, renders the SocialCompactPipeline scene, and copies the output into submission paths.
+
 $ErrorActionPreference = "Stop"
 
 $hyperframesDir = Join-Path $PSScriptRoot "hyperframes"

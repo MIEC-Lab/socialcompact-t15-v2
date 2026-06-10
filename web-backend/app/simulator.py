@@ -19,11 +19,13 @@ DEFAULT_PLAYER_NAMES = [
 ]
 
 
+# Author: Yuhao Ye (E) - local fallback simulator logic for the public V2 backend.
 def build_match_id(game: str) -> str:
     slug = game.lower().replace(" ", "-")
     return f"match-{slug}-{uuid4().hex[:8]}"
 
 
+# Author: Yuhao Ye (E) - local fallback simulator logic for the public V2 backend.
 def normalize_players(payload: StartMatchRequest) -> list[str]:
     raw_players = [player.strip() for player in payload.players if player.strip()]
     players: list[str] = []
@@ -39,6 +41,7 @@ def normalize_players(payload: StartMatchRequest) -> list[str]:
     return players
 
 
+# Author: Yuhao Ye (E) - local fallback simulator logic for the public V2 backend.
 def run_local_match(
     payload: StartMatchRequest,
     match_id: str,
@@ -51,6 +54,7 @@ def run_local_match(
     return _run_survivor(payload, match_id, players, source, note)
 
 
+# Author: Yuhao Ye (E) - local fallback simulator logic for the public V2 backend.
 def _run_survivor(
     payload: StartMatchRequest,
     match_id: str,
@@ -127,6 +131,7 @@ def _run_survivor(
     )
 
 
+# Author: Yuhao Ye (E) - local fallback simulator logic for the public V2 backend.
 def _rank_by_seed(
     payload: StartMatchRequest,
     match_id: str,
@@ -161,6 +166,7 @@ def _rank_by_seed(
     )
 
 
+# Author: Yuhao Ye (E) - local fallback simulator logic for the public V2 backend.
 def _player_status(player: str, winner: str, eliminated: set[str]) -> str:
     if player == winner:
         return "winner"

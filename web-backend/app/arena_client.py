@@ -24,11 +24,13 @@ LogAppender = Callable[[str, str, str, int, str | None, str | None], GameLogEven
 LogReplacer = Callable[[str, list[GameLogEvent]], None]
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def should_use_arena(payload: StartMatchRequest) -> bool:
     env_value = os.getenv("SOCIALCOMPACT_USE_ARENA", "").lower()
     return payload.use_arena or env_value in {"1", "true", "yes", "on"}
 
 
+# Author: Yuhao Ye (E) - foreground Arena-start path used by the public V2 backend.
 async def start_arena_match(
     payload: StartMatchRequest,
     match_id: str,
@@ -37,6 +39,7 @@ async def start_arena_match(
     return await _run_arena_stream(payload, match_id, arena_url, participants)
 
 
+# Author: Yuhao Ye (E) - background Arena-runner used to keep the web UI responsive.
 async def start_arena_match_background(
     payload: StartMatchRequest,
     match_id: str,
@@ -57,6 +60,7 @@ async def start_arena_match_background(
             None,
         )
 
+    # Author: Yuhao Ye (E) - detached background runner that preserves responsive web match creation.
     async def runner() -> None:
         try:
             if append_log is not None:
@@ -162,6 +166,7 @@ async def start_arena_match_background(
     return pending
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _preview_participants(payload: StartMatchRequest) -> dict[str, str]:
     players = normalize_players(payload)
     player_urls = _configured_player_urls(payload)
@@ -182,6 +187,7 @@ def _preview_participants(payload: StartMatchRequest) -> dict[str, str]:
     }
 
 
+# Author: Yuhao Ye (E) - request-building step that translates web payloads into Arena input.
 async def _prepare_arena_request(
     payload: StartMatchRequest,
 ) -> tuple[str, dict[str, str]]:
@@ -208,6 +214,7 @@ async def _prepare_arena_request(
     return arena_url, participants
 
 
+# Author: Yuhao Ye (E) - stream consumer that converts Arena artifacts into stored V2 events.
 async def _run_arena_stream(
     payload: StartMatchRequest,
     match_id: str,
@@ -308,6 +315,7 @@ async def _run_arena_stream(
     return _pending_arena_result(payload, match_id, participants)
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _configured_player_urls(payload: StartMatchRequest) -> list[str]:
     if payload.player_urls:
         return [_normalize_service_url(url) for url in payload.player_urls if url.strip()]
@@ -324,6 +332,7 @@ def _configured_player_urls(payload: StartMatchRequest) -> list[str]:
     return [_normalize_service_url(url) for url in env_urls.split(",") if url.strip()]
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _normalize_service_url(value: str) -> str:
     url = value.strip()
     if not url:
@@ -333,6 +342,7 @@ def _normalize_service_url(value: str) -> str:
     return f"http://{url.rstrip('/')}"
 
 
+# Author: Yuhao Ye (E) - public endpoint health-check helper for Arena and Agent services.
 async def _check_agent_card(name: str, address: str) -> None:
     try:
         import httpx
@@ -366,6 +376,7 @@ async def _check_agent_card(name: str, address: str) -> None:
         ) from exc
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _pending_arena_result(
     payload: StartMatchRequest,
     match_id: str,
@@ -388,6 +399,7 @@ def _pending_arena_result(
     )
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _failed_arena_result(
     payload: StartMatchRequest,
     match_id: str,
@@ -411,6 +423,7 @@ def _failed_arena_result(
     )
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _convert_arena_response(
     payload: StartMatchRequest,
     match_id: str,
@@ -427,6 +440,7 @@ def _convert_arena_response(
     return None
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _convert_game_log(
     payload: StartMatchRequest,
     match_id: str,
@@ -460,6 +474,7 @@ def _convert_game_log(
     )
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _convert_results_table(
     payload: StartMatchRequest,
     match_id: str,
@@ -490,6 +505,7 @@ def _convert_results_table(
     )
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _convert_round_logs(rounds: list[Any]) -> list[RoundLog]:
     round_logs: list[RoundLog] = []
     for index, item in enumerate(rounds, start=1):
@@ -517,6 +533,7 @@ def _convert_round_logs(rounds: list[Any]) -> list[RoundLog]:
     return round_logs
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _convert_game_log_to_events(
     match_id: str,
     game_log: dict[str, Any],
@@ -524,6 +541,7 @@ def _convert_game_log_to_events(
     events: list[GameLogEvent] = []
     participants = game_log.get("Participants") or {}
 
+    # Author: Yuhao Ye (E) - local collector for normalized round events while converting Arena logs.
     def add(
         phase: str,
         message: str,
@@ -614,6 +632,7 @@ def _convert_game_log_to_events(
     return events
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _convert_live_round_to_events(
     match_id: str,
     live_round: dict[str, Any],
@@ -625,6 +644,7 @@ def _convert_live_round_to_events(
     return _convert_game_log_to_events(match_id, game_log)
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _convert_live_event_to_event(
     match_id: str,
     live_event: dict[str, Any],
@@ -645,12 +665,14 @@ def _convert_live_event_to_event(
     )
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _optional_string(value: Any) -> str | None:
     if value is None:
         return None
     return str(value)
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _display_name(value: Any, participants: dict[str, Any]) -> str | None:
     if value is None:
         return None
@@ -658,6 +680,7 @@ def _display_name(value: Any, participants: dict[str, Any]) -> str | None:
     return str(participants.get(text, text))
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _find_live_events(data: Any) -> list[dict[str, Any]]:
     found: list[dict[str, Any]] = []
     if isinstance(data, dict):
@@ -672,6 +695,7 @@ def _find_live_events(data: Any) -> list[dict[str, Any]]:
     return found
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _find_live_round_logs(data: Any) -> list[dict[str, Any]]:
     found: list[dict[str, Any]] = []
     if isinstance(data, dict):
@@ -686,6 +710,7 @@ def _find_live_round_logs(data: Any) -> list[dict[str, Any]]:
     return found
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _find_game_log(data: Any) -> dict[str, Any] | None:
     if isinstance(data, dict):
         if {"Game", "Scores", "Participants"}.issubset(data.keys()):
@@ -702,6 +727,7 @@ def _find_game_log(data: Any) -> dict[str, Any] | None:
     return None
 
 
+# Author: Yuhao Ye (E) - Arena/client bridge and event normalization logic for the public V2 backend.
 def _find_key(data: Any, target_key: str) -> Any:
     if isinstance(data, dict):
         if target_key in data:

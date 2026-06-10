@@ -15,6 +15,7 @@ from app.simulator import build_match_id, normalize_players, run_local_match
 from app.storage import load_match_logs, load_match_result, save_match_logs, save_match_result
 
 
+# Author: Yuhao Ye (E) - backend orchestration and match lifecycle logic for the public V2 flow.
 def get_match_result_by_id(match_id: str) -> MatchResultResponse | None:
     result = MATCH_RESULTS.get(match_id)
     if result is None:
@@ -22,6 +23,7 @@ def get_match_result_by_id(match_id: str) -> MatchResultResponse | None:
     return result
 
 
+# Author: Yuhao Ye (E) - backend orchestration and match lifecycle logic for the public V2 flow.
 def get_match_logs_by_id(match_id: str) -> list[GameLogEvent]:
     logs = MATCH_LOGS.get(match_id)
     if logs is None:
@@ -31,6 +33,7 @@ def get_match_logs_by_id(match_id: str) -> list[GameLogEvent]:
     return logs or []
 
 
+# Author: Yuhao Ye (E) - async match-creation entrypoint for the public V2 backend.
 async def create_match(payload: StartMatchRequest) -> MatchCreateResponse:
     match_id = build_match_id(payload.game)
     players = normalize_players(payload)
@@ -77,6 +80,7 @@ async def create_match(payload: StartMatchRequest) -> MatchCreateResponse:
     )
 
 
+# Author: Yuhao Ye (E) - backend orchestration and match lifecycle logic for the public V2 flow.
 def create_mock_match(payload: StartMatchRequest) -> MatchCreateResponse:
     result = run_local_match(payload, build_match_id(payload.game))
     _store_match_result(result)
@@ -93,6 +97,7 @@ def create_mock_match(payload: StartMatchRequest) -> MatchCreateResponse:
     )
 
 
+# Author: Yuhao Ye (E) - backend orchestration and match lifecycle logic for the public V2 flow.
 def _store_match_result(result: MatchResultResponse) -> None:
     MATCH_RESULTS[result.match_id] = result
     save_match_result(result)
@@ -100,11 +105,13 @@ def _store_match_result(result: MatchResultResponse) -> None:
         replace_match_logs(result.match_id, build_logs_from_result(result, keep_existing=True))
 
 
+# Author: Yuhao Ye (E) - backend orchestration and match lifecycle logic for the public V2 flow.
 def reset_match_logs(match_id: str) -> None:
     MATCH_LOGS[match_id] = []
     save_match_logs(match_id, MATCH_LOGS[match_id])
 
 
+# Author: Yuhao Ye (E) - backend orchestration and match lifecycle logic for the public V2 flow.
 def append_match_log(
     match_id: str,
     phase: str,
@@ -141,11 +148,13 @@ def append_match_log(
     return event
 
 
+# Author: Yuhao Ye (E) - backend orchestration and match lifecycle logic for the public V2 flow.
 def replace_match_logs(match_id: str, logs: list[GameLogEvent]) -> None:
     MATCH_LOGS[match_id] = logs
     save_match_logs(match_id, logs)
 
 
+# Author: Yuhao Ye (E) - backend orchestration and match lifecycle logic for the public V2 flow.
 def build_logs_from_result(
     result: MatchResultResponse,
     keep_existing: bool,
@@ -153,6 +162,7 @@ def build_logs_from_result(
     logs = list(get_match_logs_by_id(result.match_id)) if keep_existing else []
     seen = {(event.phase, event.round, event.actor, event.target, event.message) for event in logs}
 
+    # Author: Yuhao Ye (E) - nested event-builder used to reconstruct polling logs from the stored match result.
     def add_event(
         phase: str,
         message: str,
@@ -196,6 +206,7 @@ def build_logs_from_result(
     return logs
 
 
+# Author: Yuhao Ye (E) - backend orchestration and match lifecycle logic for the public V2 flow.
 def _create_message(result: MatchResultResponse) -> str:
     if result.status == "running":
         return "Arena match was queued. The results page will keep polling while Render services wake and the Agent run continues."

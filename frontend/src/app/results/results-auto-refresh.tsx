@@ -12,6 +12,7 @@ type ResultsAutoRefreshProps = {
   enabled: boolean;
 };
 
+// Author: Chenle Chen (D) - live refresh control for the running results page.
 export function ResultsAutoRefresh({ enabled }: ResultsAutoRefreshProps) {
   const router = useRouter();
 

@@ -1,7 +1,5 @@
-# Authorship: Yuhao Ye (E) owns the V2 backend/Arena integration around this inherited service code; Bowen Dong (A) owns Render deployment of the surrounding public service; Runze Chen (F) owns public verification of the deployed endpoints.
-# Scope: Inherited Arena/Agent service code used by the public V2 deployment.
-# Original-source note: The core Arena/Agent/A2A logic in this file is inherited from the upstream ReserveJudgement/SocialCOMPACT repository.
-
+# Authors: Bowen Dong (A), Yuhao Ye (E), and Runze Chen (F).
+# Scope: Utility script for checking Agent or Arena availability and sending a V2 test request.
 import json
 import httpx
 from uuid import uuid4
@@ -17,6 +15,7 @@ PLAYERS = [
 
 ARENA = "http://127.0.0.1:9009"
 
+# Author: Bowen Dong (A), Yuhao Ye (E), and Runze Chen (F) - endpoint availability checks for local or public Arena startup.
 def check_availability(name, address):
     AGENT_CARD = "/.well-known/agent-card.json"
     try:
@@ -26,6 +25,7 @@ def check_availability(name, address):
         print(f"ERROR: {name} is OFFLINE. Check the server address {address}")
         exit(0)
 
+# Author: Bowen Dong (A), Yuhao Ye (E), and Runze Chen (F) - utility request launcher for verifying Arena startup in the V2 stack.
 async def main():
     # Step 2: Build an A2A request
     json_message = {

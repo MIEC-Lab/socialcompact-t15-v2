@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   description: "Run and visualize SocialCOMPACT Survivor matches.",
 };
 
+// Author: Bowen Dong (A) - shared app-shell layout for the public V2 demo.
 export default function RootLayout({
   children,
 }: Readonly<{

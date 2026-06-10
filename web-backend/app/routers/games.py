@@ -8,7 +8,7 @@ from app.schemas import GameListResponse
 
 router = APIRouter(prefix="/api/games", tags=["games"])
 
-
+# Author: Yuhao Ye (E) - supported-game listing endpoint for the public V2 backend.
 @router.get("", response_model=GameListResponse)
 def list_games() -> GameListResponse:
     return GameListResponse(

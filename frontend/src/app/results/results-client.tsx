@@ -31,6 +31,7 @@ type LoadState = "loading" | "ready" | "error";
 const REMAINING_PLAYERS_EVENT_PATTERN =
   /^the remaining players are:\s*(.*?)\.?$/i;
 
+// Authors: Chonglin Dong (C) and Chenle Chen (D) - results-page state conversion, orchestration, and live-run UI logic.
 function classifyRoundEvent(event: string): RoundEventType {
   const lowerEvent = event.toLowerCase();
 
@@ -64,6 +65,7 @@ function classifyRoundEvent(event: string): RoundEventType {
   return "event";
 }
 
+// Authors: Chonglin Dong (C) and Chenle Chen (D) - results-page state conversion, orchestration, and live-run UI logic.
 function splitRoundEventLines(event: string) {
   return event
     .split(/\r?\n/)
@@ -71,6 +73,7 @@ function splitRoundEventLines(event: string) {
     .filter(Boolean);
 }
 
+// Authors: Chonglin Dong (C) and Chenle Chen (D) - results-page state conversion, orchestration, and live-run UI logic.
 function inferRemainingPlayersFromEvents(events: string[]) {
   for (const event of [...events].reverse()) {
     for (const line of splitRoundEventLines(event)) {
@@ -94,6 +97,7 @@ function inferRemainingPlayersFromEvents(events: string[]) {
   return [];
 }
 
+// Authors: Chonglin Dong (C) and Chenle Chen (D) - results-page state conversion, orchestration, and live-run UI logic.
 function convertRoundLogsToDetails(
   roundLogs: MatchResult["round_logs"]
 ): RoundDetailData[] {
@@ -139,6 +143,7 @@ function convertRoundLogsToDetails(
   });
 }
 
+// Authors: Chonglin Dong (C) and Chenle Chen (D) - results-page state conversion, orchestration, and live-run UI logic.
 function resolveApiBaseUrl(apiBaseParam: string | null) {
   if (apiBaseParam) {
     return normalizeApiBaseUrl(apiBaseParam);
@@ -156,6 +161,7 @@ function resolveApiBaseUrl(apiBaseParam: string | null) {
 }
 
 // C owns the summary composition in this component, while D owns the live process/timeline wiring that feeds the page.
+// Authors: Chonglin Dong (C) and Chenle Chen (D) - results-page state conversion, orchestration, and live-run UI logic.
 export function ResultsClient() {
   const searchParams = useSearchParams();
   const explicitMatchId = searchParams.get("matchId");
@@ -179,6 +185,7 @@ export function ResultsClient() {
 
     let cancelled = false;
 
+    // Authors: Chonglin Dong (C) and Chenle Chen (D) - result polling routine for live runs and completed matches.
     async function loadResult() {
       setLoadState((currentState) =>
         currentState === "ready" ? "ready" : "loading"
@@ -374,6 +381,7 @@ export function ResultsClient() {
   );
 }
 
+// Authors: Chonglin Dong (C) and Chenle Chen (D) - results-page state conversion, orchestration, and live-run UI logic.
 function RunningProgressPanel({
   processEvents,
 }: {
@@ -458,6 +466,7 @@ function RunningProgressPanel({
   );
 }
 
+// Authors: Chonglin Dong (C) and Chenle Chen (D) - results-page state conversion, orchestration, and live-run UI logic.
 function ProgressStageCard({
   stage,
 }: {
@@ -484,6 +493,7 @@ function ProgressStageCard({
   );
 }
 
+// Authors: Chonglin Dong (C) and Chenle Chen (D) - results-page state conversion, orchestration, and live-run UI logic.
 function RunVerificationPanel({
   result,
   apiBase,
@@ -554,6 +564,7 @@ function RunVerificationPanel({
   );
 }
 
+// Authors: Chonglin Dong (C) and Chenle Chen (D) - results-page state conversion, orchestration, and live-run UI logic.
 function VerificationCard({
   label,
   value,
@@ -587,6 +598,7 @@ function VerificationCard({
   );
 }
 
+// Authors: Chonglin Dong (C) and Chenle Chen (D) - results-page state conversion, orchestration, and live-run UI logic.
 function LoadingResult({
   matchId,
   apiBase,
@@ -611,6 +623,7 @@ function LoadingResult({
   );
 }
 
+// Authors: Chonglin Dong (C) and Chenle Chen (D) - results-page state conversion, orchestration, and live-run UI logic.
 function MissingResult({
   matchId,
   apiBase,
@@ -650,6 +663,7 @@ function MissingResult({
   );
 }
 
+// Authors: Chonglin Dong (C) and Chenle Chen (D) - results-page state conversion, orchestration, and live-run UI logic.
 function FailedResultHero({ result }: { result: MatchResult }) {
   return (
     <section className="rounded-[36px] border border-rose-300/20 bg-[linear-gradient(145deg,rgba(190,18,60,0.2),rgba(15,23,42,0.88))] p-8 shadow-2xl shadow-rose-950/30 backdrop-blur">

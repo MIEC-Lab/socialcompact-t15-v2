@@ -5,6 +5,7 @@
 
 import Link from "next/link";
 
+// Author: Bowen Dong (A) - homepage component for the public V2 demo.
 export default function Home() {
   return (
     <main className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.18),_transparent_28%),linear-gradient(135deg,_#020617,_#0f172a_45%,_#111827)] text-white">

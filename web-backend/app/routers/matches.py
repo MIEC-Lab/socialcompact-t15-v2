@@ -13,12 +13,13 @@ from app.services import (
 
 router = APIRouter(prefix="/api/matches", tags=["matches"])
 
-
+# Author: Yuhao Ye (E) - HTTP route that creates a public match and returns its match_id.
 @router.post("", response_model=MatchCreateResponse)
 async def create_match(payload: StartMatchRequest) -> MatchCreateResponse:
     return await create_match_service(payload)
 
 
+# Author: Yuhao Ye (E) - match-creation and match-log endpoints for the public V2 backend.
 @router.get("/{match_id}", response_model=MatchResultResponse)
 def get_match(match_id: str) -> MatchResultResponse:
     result = get_match_result_by_id(match_id)
@@ -27,6 +28,7 @@ def get_match(match_id: str) -> MatchResultResponse:
     return result
 
 
+# Author: Yuhao Ye (E) - match-creation and match-log endpoints for the public V2 backend.
 @router.get("/{match_id}/logs", response_model=MatchLogsResponse)
 def get_match_logs(match_id: str) -> MatchLogsResponse:
     result = get_match_result_by_id(match_id)

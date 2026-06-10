@@ -14,6 +14,7 @@ type ChatPanelProps = {
   title?: string;
 };
 
+// Author: Chenle Chen (D) - chat-panel presentation for live process visibility.
 export function ChatPanel({ chats, title = "Chats" }: ChatPanelProps) {
   return (
     <section className="rounded-3xl border border-white/10 bg-slate-950/45 p-5">

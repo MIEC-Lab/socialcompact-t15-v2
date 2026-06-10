@@ -1,6 +1,5 @@
-# Authorship: Yuhao Ye (E) owns the V2 backend/Arena integration around this inherited service code; Bowen Dong (A) owns Render deployment of the surrounding public service; Runze Chen (F) owns public verification of the deployed endpoints.
-# Scope: Inherited Arena/Agent service code used by the public V2 deployment.
-# Original-source note: The core Arena/Agent/A2A logic in this file is inherited from the upstream ReserveJudgement/SocialCOMPACT repository.
+# Original-source note: This file is inherited from the upstream ReserveJudgement/SocialCOMPACT repository.
+# V2 note: Our team deploys and connects this Arena or Agent service from the public web stack, but the core A2A or game logic below remains upstream code.
 
 import argparse
 import os
@@ -18,6 +17,7 @@ from a2a.types import (
 from arena_executor import Executor
 
 
+# V2 modification authorship: Bowen Dong (A), Yuhao Ye (E), and Runze Chen (F) updated PORT and public card-url handling for the deployed Arena service.
 def main():
     parser = argparse.ArgumentParser(description="Run the A2A agent.")
     parser.add_argument("--host", type=str, default="127.0.0.1", help="Host to bind the server")

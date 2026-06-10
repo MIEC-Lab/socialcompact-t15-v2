@@ -177,6 +177,7 @@ type RoundTimelineProps = {
   rounds?: RoundDetailData[];
 };
 
+// Author: Chenle Chen (D) - round-timeline helpers and interactive progression view.
 function eventTone(type: RoundEventType) {
   if (type === "elimination") {
     return {
@@ -206,6 +207,7 @@ function eventTone(type: RoundEventType) {
   };
 }
 
+// Author: Chenle Chen (D) - round-timeline helpers and interactive progression view.
 function playerColorClass(index: number) {
   const colors = [
     "border-cyan-300/30 bg-cyan-300/15 text-cyan-100",
@@ -218,10 +220,12 @@ function playerColorClass(index: number) {
   return colors[index % colors.length];
 }
 
+// Author: Chenle Chen (D) - round-timeline helpers and interactive progression view.
 function getPlayerInitial(player: string) {
   return player.trim().slice(0, 1).toUpperCase() || "?";
 }
 
+// Author: Chenle Chen (D) - round-timeline helpers and interactive progression view.
 function getKeyEvent(events: RoundEvent[]) {
   return (
     events.find((event) => event.type === "elimination") ??
@@ -231,12 +235,14 @@ function getKeyEvent(events: RoundEvent[]) {
   );
 }
 
+// Author: Chenle Chen (D) - round-timeline helpers and interactive progression view.
 export function RoundTimeline({ rounds }: RoundTimelineProps) {
   const visibleRounds = rounds ?? demoRounds;
   const [openRoundIds, setOpenRoundIds] = useState<number[]>(
     visibleRounds.map((round) => round.id)
   );
 
+  // Author: Chenle Chen (D) - local expand/collapse handler for round cards.
   function toggleRound(roundId: number) {
     setOpenRoundIds((currentIds) =>
       currentIds.includes(roundId)

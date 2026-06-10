@@ -1,6 +1,5 @@
-# Authorship: Yuhao Ye (E) owns the V2 backend/Arena integration around this inherited service code; Bowen Dong (A) owns Render deployment of the surrounding public service; Runze Chen (F) owns public verification of the deployed endpoints.
-# Scope: Inherited Arena/Agent service code used by the public V2 deployment.
-# Original-source note: The core Arena/Agent/A2A logic in this file is inherited from the upstream ReserveJudgement/SocialCOMPACT repository.
+# Original-source note: This file is inherited from the upstream ReserveJudgement/SocialCOMPACT repository.
+# V2 note: Our team deploys and connects this Arena or Agent service from the public web stack, but the core A2A or game logic below remains upstream code.
 
 import ast
 import json
@@ -113,6 +112,7 @@ class Agent:
         required = request.config.get("required") # list of participants that are compulsory to run in game
         if isinstance(required, list) and len(required) == 0:
             required = None
+        # V2 modification authorship: Yuhao Ye (E) added web-configurable game, scenario, and max-turn selection so the public backend can launch specific Arena runs.
         requested_games = request.config.get("games") or request.config.get("game")
         if isinstance(requested_games, str):
             requested_games = [requested_games]
@@ -236,6 +236,7 @@ class Agent:
                                                url=player["Url"], new_conversation=True)
         return
 
+    # V2 modification authorship: Yuhao Ye (E) added live event artifacts so the web UI can poll per-phase Arena progress.
     async def emit_live_event(
         self,
         updater: TaskUpdater,
@@ -262,6 +263,7 @@ class Agent:
             name=f"Game{self.task.get('Id', 0)}-{phase}-{round_number}-{int(time.time() * 1000)}",
         )
 
+    # V2 modification authorship: Yuhao Ye (E) extended this inherited chat phase to stream live chat events into the public web demo.
     async def facilitate_chat(self, updater: TaskUpdater, round_number: int, max_rounds: int = 3) -> None:
         """Helper method to get and send messages between players in a centralized fashion"""
         # construct a conversation
@@ -305,6 +307,7 @@ class Agent:
                 await self.emit_live_event(updater, "chat", response, round_number, second, first)
         return
 
+    # V2 modification authorship: Yuhao Ye (E) extended this inherited prediction phase to publish reasoning and prediction artifacts for the public results page.
     async def get_predictions(self, updater: TaskUpdater, round_number: int):
         # base prompt
         base_prompt = ("Enclose your main reasons within the <reasoning> </reasoning> tags." +
@@ -354,6 +357,7 @@ class Agent:
                     )
         return
 
+    # V2 modification authorship: Yuhao Ye (E) extended this inherited action phase to publish decision artifacts for the public results page.
     async def get_actions(self, updater: TaskUpdater, round_number: int):
         prompt = (self.env.action_format()["description"] +
                     "Enclose your main reasons within the <reasoning> </reasoning> tags." +
@@ -432,6 +436,7 @@ class Agent:
             )
         return
 
+    # V2 modification authorship: Yuhao Ye (E) extended this inherited observation phase to stream post-action observations back to the web UI.
     async def send_observations(self, updater: TaskUpdater, round_number: int):
         for player in [x for x in self.players if x["Name"] not in self.env.eliminated]:
             prompt = "Your next observations: " + str(self.observations[player["Name"]])
@@ -496,6 +501,7 @@ class Agent:
                     self.predictions[player][other]["accuracy"] = acc
         return
 
+    # V2 modification authorship: Yuhao Ye (E) extended the inherited game loop to emit round-level artifacts and live system updates for polling clients.
     async def orchestrate_game(self, updater):
         print("running: ", self.task["Game"])
         print("with: ", self.players)

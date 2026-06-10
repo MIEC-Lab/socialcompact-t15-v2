@@ -11,6 +11,7 @@ type ResultSummaryHighlightsProps = {
   stats: ResultPresentation["stats"];
 };
 
+// Author: Chonglin Dong (C) - summary highlight cards for the results page.
 export function ResultSummaryHighlights({
   result,
   stats,

@@ -15,7 +15,7 @@ from app.storage import list_saved_match_ids
 
 router = APIRouter(prefix="/api/results", tags=["results"])
 
-
+# Author: Yuhao Ye (E) - result polling endpoints for mock, saved, and live match responses.
 @router.get("/mock", response_model=MatchResultResponse)
 def get_mock_result() -> MatchResultResponse:
     result = get_match_result_by_id("mock-match-001")
@@ -24,6 +24,7 @@ def get_mock_result() -> MatchResultResponse:
     return result
 
 
+# Author: Yuhao Ye (E) - result polling endpoints for mock, saved, and live match responses.
 @router.get("/source/files", response_model=DataSourceResponse)
 def list_file_results() -> DataSourceResponse:
     match_ids = list_saved_match_ids()
@@ -34,6 +35,7 @@ def list_file_results() -> DataSourceResponse:
     )
 
 
+# Author: Yuhao Ye (E) - result polling endpoints for mock, saved, and live match responses.
 @router.get("/{match_id}", response_model=MatchResultResponse)
 def get_match_result(match_id: str) -> MatchResultResponse:
     result = get_match_result_by_id(match_id)
@@ -42,6 +44,7 @@ def get_match_result(match_id: str) -> MatchResultResponse:
     return result
 
 
+# Author: Yuhao Ye (E) - compatibility route that starts a match from the results API namespace.
 @router.post("/start", response_model=MatchCreateResponse)
 async def start_match(payload: StartMatchRequest) -> MatchCreateResponse:
     return await create_match(payload)

@@ -15,10 +15,12 @@ import {
 } from "@/lib/api";
 import type { MatchCreateResponse } from "@/lib/types";
 
+// Author: Zichong You (B) - start-page helpers and match submission flow for the public V2 demo.
 function buildPlayerNames(playerCount: number) {
   return Array.from({ length: playerCount }, (_, index) => `Player ${index + 1}`);
 }
 
+// Author: Zichong You (B) - start-page helpers and match submission flow for the public V2 demo.
 function parseAgentUrls(value: string) {
   return value
     .split(/[\n,]+/)
@@ -26,14 +28,17 @@ function parseAgentUrls(value: string) {
     .filter(Boolean);
 }
 
+// Author: Zichong You (B) - start-page helpers and match submission flow for the public V2 demo.
 function getInitialUseArena() {
   return process.env.NEXT_PUBLIC_DEFAULT_USE_ARENA === "true";
 }
 
+// Author: Zichong You (B) - start-page helpers and match submission flow for the public V2 demo.
 function getInitialAgentUrls() {
   return process.env.NEXT_PUBLIC_DEFAULT_AGENT_URLS || "";
 }
 
+// Author: Zichong You (B) - start-page helpers and match submission flow for the public V2 demo.
 function getInitialBackendUrl() {
   const publicApiBaseUrl = getPublicApiBaseUrl();
 
@@ -61,6 +66,7 @@ function getInitialBackendUrl() {
   return normalizedSavedApiBaseUrl;
 }
 
+// Author: Zichong You (B) - start-page helpers and match submission flow for the public V2 demo.
 export default function StartPage() {
   const router = useRouter();
   const [backendUrl, setBackendUrl] = useState(getInitialBackendUrl);
@@ -83,6 +89,7 @@ export default function StartPage() {
         ? "Local Arena"
         : "Local Simulation";
 
+  // Author: Zichong You (B) - public-backend shortcut handler on the start page.
   function usePublicBackend() {
     setBackendUrl(publicBackendUrl);
     setUseArena(true);
@@ -93,6 +100,7 @@ export default function StartPage() {
     );
   }
 
+  // Author: Zichong You (B) - browser-side match submission handler for the start page.
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 

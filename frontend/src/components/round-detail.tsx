@@ -44,6 +44,7 @@ type RoundDetailProps = {
   round: RoundDetailData;
 };
 
+// Author: Chenle Chen (D) - round-detail cards and per-round explanation views.
 function EmptyState({ label }: { label: string }) {
   return (
     <p className="rounded-2xl border border-white/10 bg-slate-950/35 px-4 py-3 text-sm text-slate-400">
@@ -52,6 +53,7 @@ function EmptyState({ label }: { label: string }) {
   );
 }
 
+// Author: Chenle Chen (D) - round-detail cards and per-round explanation views.
 export function RoundDetail({ round }: RoundDetailProps) {
   return (
     <section className="rounded-[32px] border border-white/10 bg-white/6 p-6 backdrop-blur">

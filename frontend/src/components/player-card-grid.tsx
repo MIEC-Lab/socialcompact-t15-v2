@@ -11,6 +11,7 @@ type PlayerCardGridProps = {
   winnerByArenaVerdict?: boolean;
 };
 
+// Author: Chonglin Dong (C) - player-card grid layout for the results page.
 export function PlayerCardGrid({
   players,
   winnerByArenaVerdict = false,

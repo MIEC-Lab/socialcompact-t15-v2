@@ -19,14 +19,17 @@ const phaseStyles: Record<string, string> = {
   observation: "border-emerald-300/25 bg-emerald-300/10 text-emerald-100",
 };
 
+// Author: Chenle Chen (D) - live log rendering helpers and process counters for the results page.
 function phaseClassName(phase: string) {
   return phaseStyles[phase] ?? phaseStyles.system;
 }
 
+// Author: Chenle Chen (D) - live log rendering helpers and process counters for the results page.
 function formatPhase(phase: string) {
   return phase.replace(/_/g, " ").toUpperCase();
 }
 
+// Author: Chenle Chen (D) - live log rendering helpers and process counters for the results page.
 function formatTime(value: string) {
   const date = new Date(value);
 
@@ -41,6 +44,7 @@ function formatTime(value: string) {
   });
 }
 
+// Author: Chenle Chen (D) - live log rendering helpers and process counters for the results page.
 export function GameProcessLog({ events, isPolling }: GameProcessLogProps) {
   const visibleEvents = events.slice(-80);
   const chatLikeCount = events.filter((event) =>
@@ -131,6 +135,7 @@ export function GameProcessLog({ events, isPolling }: GameProcessLogProps) {
   );
 }
 
+// Author: Chenle Chen (D) - live log rendering helpers and process counters for the results page.
 function LogCounter({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-full border border-white/10 bg-white/6 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-200">

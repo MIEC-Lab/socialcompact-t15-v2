@@ -8,6 +8,7 @@ import { ResultsClient } from "./results-client";
 
 export const dynamic = "force-dynamic";
 
+// Author: Chonglin Dong (C) - results-route shell for the public V2 demo.
 export default function ResultsPage() {
   return (
     <Suspense fallback={<ResultsFallback />}>
@@ -16,6 +17,7 @@ export default function ResultsPage() {
   );
 }
 
+// Author: Chonglin Dong (C) - results-route shell for the public V2 demo.
 function ResultsFallback() {
   return (
     <main className="min-h-screen bg-[linear-gradient(135deg,_#020617,_#0f172a_45%,_#111827)] text-white">

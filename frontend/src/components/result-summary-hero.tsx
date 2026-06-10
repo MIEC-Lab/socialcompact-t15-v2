@@ -16,6 +16,7 @@ type ResultSummaryHeroProps = {
   hasEliminations: boolean;
 };
 
+// Author: Chonglin Dong (C) - top-of-page verdict hero and supporting summary visuals.
 export function ResultSummaryHero({
   result,
   winner,
@@ -195,6 +196,7 @@ export function ResultSummaryHero({
   );
 }
 
+// Author: Chonglin Dong (C) - top-of-page verdict hero and supporting summary visuals.
 function HeroMetric({
   label,
   value,
@@ -215,6 +217,7 @@ function HeroMetric({
   );
 }
 
+// Author: Chonglin Dong (C) - top-of-page verdict hero and supporting summary visuals.
 function SignalStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-black/18 px-4 py-3">
@@ -226,6 +229,7 @@ function SignalStat({ label, value }: { label: string; value: string }) {
   );
 }
 
+// Author: Chonglin Dong (C) - top-of-page verdict hero and supporting summary visuals.
 function SignalMeter({
   label,
   value,

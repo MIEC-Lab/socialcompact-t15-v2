@@ -36,6 +36,7 @@ const toneMap = {
   },
 } as const;
 
+// Author: Chonglin Dong (C) - per-player result-card presentation and stat helpers.
 export function PlayerCard({ player }: PlayerCardProps) {
   const tone = toneMap[player.tone];
 
@@ -113,6 +114,7 @@ export function PlayerCard({ player }: PlayerCardProps) {
   );
 }
 
+// Author: Chonglin Dong (C) - per-player result-card presentation and stat helpers.
 function Meter({
   label,
   value,
@@ -146,6 +148,7 @@ function Meter({
   );
 }
 
+// Author: Chonglin Dong (C) - per-player result-card presentation and stat helpers.
 function StatTile({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0 rounded-2xl border border-white/10 bg-white/6 px-4 py-3">

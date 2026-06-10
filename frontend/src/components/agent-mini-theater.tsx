@@ -60,6 +60,7 @@ const HIT_EVENT_PATTERN = /^(.*?) hit (.*?)!$/;
 const MISSED_EVENT_PATTERN = /^(.*?) attacked (.*?) but missed!\.$/;
 
 // Shared ownership inside this file: B shaped the character presentation, C integrated the stage into the results layout, and D implemented the live event-driven behavior.
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 export function AgentMiniTheater({
   result,
   processEvents,
@@ -289,6 +290,7 @@ export function AgentMiniTheater({
   );
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function getTheaterNames(result: MatchResult, events: GameLogEvent[]) {
   const eventNames = events
     .flatMap((event) => [event.actor, event.target])
@@ -302,6 +304,7 @@ function getTheaterNames(result: MatchResult, events: GameLogEvent[]) {
   ];
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function buildAgentRole(
   name: string,
   side: AgentRole["side"],
@@ -331,6 +334,7 @@ function buildAgentRole(
   };
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function formatPhaseLabel(phase: string) {
   if (phase === "chat") {
     return "Chat";
@@ -350,6 +354,7 @@ function formatPhaseLabel(phase: string) {
   return phase.replace(/_/g, " ");
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function formatEventMessage(message: string) {
   try {
     return JSON.stringify(JSON.parse(message), null, 2);
@@ -358,6 +363,7 @@ function formatEventMessage(message: string) {
   }
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function TheaterMetric({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0 rounded-2xl border border-white/10 bg-white/6 px-4 py-3">
@@ -369,6 +375,7 @@ function TheaterMetric({ label, value }: { label: string; value: string }) {
   );
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function SpeechBubble({
   agent,
   active,
@@ -440,6 +447,7 @@ function SpeechBubble({
   );
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function MiniBadge({ label, active }: { label: string; active: boolean }) {
   return (
     <span
@@ -454,6 +462,7 @@ function MiniBadge({ label, active }: { label: string; active: boolean }) {
   );
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function formatBubbleSignal(event: GameLogEvent) {
   if (event.phase === "prediction" || event.phase === "decision") {
     const parsedAction = parseBubbleAction(event.message);
@@ -466,10 +475,12 @@ function formatBubbleSignal(event: GameLogEvent) {
   return event.message;
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function parseBubbleAction(message: string) {
   return parseDecisionActions(message)[0] ?? null;
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function DoodleDuelist({
   agent,
   active,
@@ -1129,6 +1140,7 @@ function DoodleDuelist({
   );
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function ShotAnimationLayer({
   cue,
   mode,
@@ -1155,6 +1167,7 @@ function ShotAnimationLayer({
   );
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function ShotAnimation({
   cue,
   index,
@@ -1213,6 +1226,7 @@ function ShotAnimation({
   );
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function TheaterSignalCard({
   title,
   phase,
@@ -1263,6 +1277,7 @@ function TheaterSignalCard({
   );
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function TheaterSidePanel({
   title,
   phase,
@@ -1301,6 +1316,7 @@ function TheaterSidePanel({
   );
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function TimelineEvent({ event }: { event: GameLogEvent }) {
   return (
     <article className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
@@ -1318,6 +1334,7 @@ function TimelineEvent({ event }: { event: GameLogEvent }) {
   );
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function getStageVolleyCue(
   event: GameLogEvent | undefined,
   leftName: string,
@@ -1342,6 +1359,7 @@ function getStageVolleyCue(
   } satisfies StageVolleyCue;
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function getShotCuesFromEvent(
   event: GameLogEvent,
   leftName: string,
@@ -1358,6 +1376,7 @@ function getShotCuesFromEvent(
   return [];
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function getDecisionShotCues(
   event: GameLogEvent,
   leftName: string,
@@ -1374,6 +1393,7 @@ function getDecisionShotCues(
     .filter((shot): shot is ShotCue => Boolean(shot));
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function getObservationShotCues(
   message: string,
   leftName: string,
@@ -1425,6 +1445,7 @@ function getObservationShotCues(
   return shots;
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function toShotCue(
   actor: string,
   target: string,
@@ -1452,6 +1473,7 @@ function toShotCue(
   } satisfies ShotCue;
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function resolveAgentSide(
   name: string,
   leftName: string,
@@ -1474,6 +1496,7 @@ function resolveAgentSide(
   return null;
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function parseDecisionActions(message: string) {
   const payload = decodeStructuredMessage(message);
   const rawItems = Array.isArray(payload) ? payload : [payload];
@@ -1508,6 +1531,7 @@ function parseDecisionActions(message: string) {
   });
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function decodeStructuredMessage(message: string): unknown {
   let candidate: unknown = message.trim();
 
@@ -1532,6 +1556,7 @@ function decodeStructuredMessage(message: string): unknown {
   return candidate;
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function splitEventLines(message: string) {
   return message
     .split(/\r?\n/)
@@ -1539,10 +1564,12 @@ function splitEventLines(message: string) {
     .filter(Boolean);
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function normalizeName(name: string) {
   return name.trim().toLowerCase();
 }
 
+// Authors: Zichong You (B), Chonglin Dong (C), and Chenle Chen (D) - mini-theater layout, character presentation, and animation/event logic.
 function toDomId(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 }

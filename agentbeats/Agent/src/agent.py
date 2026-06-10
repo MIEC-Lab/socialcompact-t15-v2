@@ -1,6 +1,5 @@
-# Authorship: Yuhao Ye (E) owns the V2 backend/Arena integration around this inherited service code; Bowen Dong (A) owns Render deployment of the surrounding public service; Runze Chen (F) owns public verification of the deployed endpoints.
-# Scope: Inherited Arena/Agent service code used by the public V2 deployment.
-# Original-source note: The core Arena/Agent/A2A logic in this file is inherited from the upstream ReserveJudgement/SocialCOMPACT repository.
+# Original-source note: This file is inherited from the upstream ReserveJudgement/SocialCOMPACT repository.
+# V2 note: Our team deploys and connects this Arena or Agent service from the public web stack, but the core A2A or game logic below remains upstream code.
 
 import asyncio
 import difflib
@@ -32,8 +31,10 @@ class Agent:
         self.predictions = {}
         self.action = None
         self.history = "The game has just begun, nothing has happened yet."
+        # V2 modification authorship: Yuhao Ye (E) added serialized model access so the public Agent service stays stable under concurrent requests.
         self.model_lock = asyncio.Lock()
 
+    # V2 modification authorship: Yuhao Ye (E) added a shared async wrapper so inherited agent prompts run safely inside the deployed web flow.
     async def call_model(self, instruction):
         async with self.model_lock:
             return str(await asyncio.to_thread(self.model, instruction))

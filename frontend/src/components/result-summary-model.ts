@@ -64,6 +64,7 @@ type CombatTotals = {
   eliminated: boolean;
 };
 
+// Authors: Chonglin Dong (C) and Yuhao Ye (E) - result normalization between backend payloads and frontend presentation.
 export function normalizeMatchResult(
   result: Partial<MatchResult> &
     Pick<
@@ -84,6 +85,7 @@ export function normalizeMatchResult(
   };
 }
 
+// Authors: Chonglin Dong (C) and Yuhao Ye (E) - result normalization between backend payloads and frontend presentation.
 export function buildDemoFallback(matchId = "mock-match-001"): MatchResult {
   return {
     match_id: matchId,
@@ -162,6 +164,7 @@ export function buildDemoFallback(matchId = "mock-match-001"): MatchResult {
   };
 }
 
+// Authors: Chonglin Dong (C) and Yuhao Ye (E) - result normalization between backend payloads and frontend presentation.
 export function buildResultPresentation(result: MatchResult): ResultPresentation {
   const players = [...result.players].sort((left, right) => {
     const winnerPriority =
@@ -361,6 +364,7 @@ export function buildResultPresentation(result: MatchResult): ResultPresentation
   };
 }
 
+// Authors: Chonglin Dong (C) and Yuhao Ye (E) - result normalization between backend payloads and frontend presentation.
 function splitEventLines(event: string) {
   return event
     .split(/\r?\n/)
@@ -368,6 +372,7 @@ function splitEventLines(event: string) {
     .filter(Boolean);
 }
 
+// Authors: Chonglin Dong (C) and Yuhao Ye (E) - result normalization between backend payloads and frontend presentation.
 function inferObservedDamage(eventLines: string[]) {
   const lostLivesLine = eventLines.find((eventLine) =>
     LOST_LIVES_EVENT_PATTERN.test(eventLine)
@@ -381,6 +386,7 @@ function inferObservedDamage(eventLines: string[]) {
   return Number(lostLivesMatch[1]);
 }
 
+// Authors: Chonglin Dong (C) and Yuhao Ye (E) - result normalization between backend payloads and frontend presentation.
 function applyDamageEvent(
   totals: Map<string, CombatTotals>,
   attacker: string,
@@ -401,6 +407,7 @@ function applyDamageEvent(
   }
 }
 
+// Authors: Chonglin Dong (C) and Yuhao Ye (E) - result normalization between backend payloads and frontend presentation.
 function normalizeStatus(status: string): NormalizedStatus {
   const value = status.trim().toLowerCase();
 
@@ -432,6 +439,7 @@ function normalizeStatus(status: string): NormalizedStatus {
   return "active";
 }
 
+// Authors: Chonglin Dong (C) and Yuhao Ye (E) - result normalization between backend payloads and frontend presentation.
 function determineTone(
   status: NormalizedStatus,
   eliminated: boolean
@@ -448,6 +456,7 @@ function determineTone(
   return "active";
 }
 
+// Authors: Chonglin Dong (C) and Yuhao Ye (E) - result normalization between backend payloads and frontend presentation.
 function formatStatusLabel(status: NormalizedStatus, rawStatus: string) {
   if (status === "winner") {
     return "Winner";
@@ -464,6 +473,7 @@ function formatStatusLabel(status: NormalizedStatus, rawStatus: string) {
   return "Eliminated";
 }
 
+// Authors: Chonglin Dong (C) and Yuhao Ye (E) - result normalization between backend payloads and frontend presentation.
 function inferFallbackHp(status: NormalizedStatus, index: number) {
   if (status === "winner") {
     return DISPLAY_MAX_HP - 1;
@@ -477,6 +487,7 @@ function inferFallbackHp(status: NormalizedStatus, index: number) {
   return Math.max(2, DISPLAY_MAX_HP - (index + 2));
 }
 
+// Authors: Chonglin Dong (C) and Yuhao Ye (E) - result normalization between backend payloads and frontend presentation.
 function inferFallbackShotsFired(
   status: NormalizedStatus,
   index: number,
@@ -497,6 +508,7 @@ function inferFallbackShotsFired(
   return Math.min(ammoCapacity - 2, Math.max(1, safeRounds - index));
 }
 
+// Authors: Chonglin Dong (C) and Yuhao Ye (E) - result normalization between backend payloads and frontend presentation.
 function buildInsight(
   tone: PlayerCardTone,
   statusLabel: string,
@@ -524,6 +536,7 @@ function buildInsight(
   return `Ended the match with a ${statusLabel.toLowerCase()} result and a stable scoreboard contribution.`;
 }
 
+// Authors: Chonglin Dong (C) and Yuhao Ye (E) - result normalization between backend payloads and frontend presentation.
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }

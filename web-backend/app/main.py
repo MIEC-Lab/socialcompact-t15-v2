@@ -25,17 +25,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+# Author: Yuhao Ye (E) - FastAPI entrypoint and health endpoints for the public V2 backend.
 @app.get("/")
 def root() -> dict[str, str]:
     return {"message": "SocialCOMPACT backend is running"}
 
 
+# Author: Yuhao Ye (E) - FastAPI entrypoint and health endpoints for the public V2 backend.
 @app.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
     return HealthResponse(status="ok", service="web-backend", version=API_VERSION)
 
 
+# Author: Yuhao Ye (E) - FastAPI entrypoint and health endpoints for the public V2 backend.
 @app.get("/api/health", response_model=HealthResponse)
 def api_health() -> HealthResponse:
     return HealthResponse(status="ok", service="web-backend", version=API_VERSION)

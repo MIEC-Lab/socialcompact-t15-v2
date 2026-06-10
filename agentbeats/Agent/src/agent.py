@@ -15,6 +15,8 @@ from messenger import Messenger
 load_dotenv()
 
 class Agent:
+    # Original upstream logic continues in this initializer.
+    # Only the V2-tagged lines inside __init__ were added by our team.
     def __init__(self):
         self.messenger = Messenger()
         # Initialize other state here
@@ -39,6 +41,8 @@ class Agent:
         async with self.model_lock:
             return str(await asyncio.to_thread(self.model, instruction))
 
+    # Original upstream logic continues in this handler.
+    # Only the V2-tagged model-call replacements inside run were changed by our team.
     async def run(self, message: Message, updater: TaskUpdater) -> None:
         """Implement your agent logic here.
 
@@ -85,6 +89,7 @@ class Agent:
             self.chats[interlocutor].append(new_message)
             # Get LLM response
             instruction = [{"role": "user", "content": prompt}]
+            # V2 modification authorship: Yuhao Ye (E) replaced the original blocking model call with the shared async wrapper.
             response = await self.call_model(instruction)
             print(response)
             self.chats[interlocutor].append({"from": self.name, "to": interlocutor, "message": response})
@@ -105,6 +110,7 @@ class Agent:
                       "\nChats this round:\n" + json.dumps(self.chats) + "\n" + str(incoming["message"]))
             # Get LLM response
             instruction = [{"role": "user", "content": prompt}]
+            # V2 modification authorship: Yuhao Ye (E) replaced the original blocking model call with the shared async wrapper.
             response = await self.call_model(instruction)
             print(response)
             self.predictions[subject] = response
@@ -122,6 +128,7 @@ class Agent:
                       "\n" + str(incoming["message"]))
             # Get LLM response
             instruction = [{"role": "user", "content": prompt}]
+            # V2 modification authorship: Yuhao Ye (E) replaced the original blocking model call with the shared async wrapper.
             response = await self.call_model(instruction)
             print(response)
             self.action = response
@@ -141,6 +148,7 @@ class Agent:
                       "Be concise and include lessons for future decisions in the game.")
             # Get LLM response
             instruction = [{"role": "user", "content": prompt}]
+            # V2 modification authorship: Yuhao Ye (E) replaced the original blocking model call with the shared async wrapper.
             response = await self.call_model(instruction)
             print(response)
             if response is not None:

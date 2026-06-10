@@ -55,6 +55,8 @@ class Agent:
     # Fill in: list of required config keys, e.g. ["topic", "num_rounds"]
     required_config_keys: list[str] = []
 
+    # Original upstream logic continues in this initializer.
+    # This setup method itself is inherited; V2 ownership is only claimed on separately tagged additions.
     def __init__(self):
         self.messenger = Messenger()
         # Initialize other state here
@@ -69,6 +71,7 @@ class Agent:
         self.logs = []
         self.players = []
 
+    # Original upstream validation logic continues below.
     def validate_request(self, request: EvalRequest) -> tuple[bool, str]:
         missing_roles = set(self.required_roles) - set(request.participants.keys())
         if missing_roles:
@@ -82,6 +85,8 @@ class Agent:
 
         return True, "ok"
 
+    # Original upstream Arena execution logic continues in this handler.
+    # Only the V2-tagged configuration and event-streaming blocks inside run were added by our team.
     async def run(self, message: Message, updater: TaskUpdater) -> None:
         """Implement your agent logic here.
 
@@ -221,6 +226,7 @@ class Agent:
             TaskState.completed, new_agent_text_message(f"Completed Evaluation!")
         )
 
+    # Original upstream onboarding logic continues below.
     async def onboarding(self) -> None:
         for player in self.players:
             prompt = ("Background: " + self.env.game_description() +
@@ -453,6 +459,7 @@ class Agent:
                                                url=player["Url"])
         return
 
+    # Original upstream prediction-accuracy logic continues below.
     async def calculate_pred_accuracy(self):
         print("predicting accuracies")
         for player in list(self.predictions.keys()):
